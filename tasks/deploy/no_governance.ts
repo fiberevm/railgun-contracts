@@ -95,9 +95,9 @@ task(
     await (
       await railgun.initializeRailgunLogic(
         treasuryProxy.address,
-        25n,
-        25n,
-        25n,
+        0n,
+        0n,
+        0n,
         (
           await ethers.getSigners()
         )[0].address,
