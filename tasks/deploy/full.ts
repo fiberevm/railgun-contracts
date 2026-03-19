@@ -1,11 +1,11 @@
 import { task } from 'hardhat/config';
 
 import { loadArtifacts, listArtifacts } from '../../helpers/logic/artifacts';
+import { configureShieldAuthorization, resolveShieldAuthorizationConfig } from './shared';
 import type { Contract } from 'ethers';
 
 /**
  * Log data to verify contract
- *
  * @param name - name of contract
  * @param contract - contract object
  * @param constructorArguments - constructor arguments
@@ -27,13 +27,25 @@ async function logVerify(
 task('deploy:full', 'Creates full deployment')
   .addParam('railName', 'Name of Rail ERC20 governance token')
   .addParam('railSymbol', 'Symbol of Rail ERC20 governance token')
-  .addParam('weth9', 'Address of WETH9 wrapped base token contract')
+  .addOptionalParam('bundler', 'Address allowed to call shield')
+  .addOptionalParam('trustedsigner', 'Address used to sign shield authorizations')
   .setAction(async function (
-    { railName, railSymbol, weth9 }: { railName: string; railSymbol: string; weth9: string },
+    {
+      railName,
+      railSymbol,
+      bundler,
+      trustedsigner,
+    }: {
+      railName: string;
+      railSymbol: string;
+      bundler?: string;
+      trustedsigner?: string;
+    },
     hre,
   ) {
     const { ethers } = hre;
     await hre.run('compile');
+    const [deployer] = await ethers.getSigners();
 
     // Get build artifacts
     const Delegator = await ethers.getContractFactory('Delegator');
@@ -42,7 +54,6 @@ task('deploy:full', 'Creates full deployment')
     const Proxy = await ethers.getContractFactory('PausableUpgradableProxy');
     const ProxyAdmin = await ethers.getContractFactory('ProxyAdmin');
     const RailToken = await ethers.getContractFactory('RailTokenFixedSupply');
-    const RelayAdapt = await ethers.getContractFactory('RelayAdapt');
     const Staking = await ethers.getContractFactory('Staking');
     const TreasuryImplementation = await ethers.getContractFactory('Treasury');
     const Voting = await ethers.getContractFactory('Voting');
@@ -61,9 +72,7 @@ task('deploy:full', 'Creates full deployment')
 
     // Deploy RailToken
     const rail = await RailToken.deploy(
-      (
-        await ethers.getSigners()
-      )[0].address,
+      deployer.address,
       50000000n * 10n ** 18n,
       railName,
       railSymbol,
@@ -75,8 +84,8 @@ task('deploy:full', 'Creates full deployment')
     await logVerify('Staking', staking, [rail.address]);
 
     // Deploy delegator
-    const delegator = await Delegator.deploy((await ethers.getSigners())[0].address);
-    await logVerify('Delegator', delegator, [(await ethers.getSigners())[0].address]);
+    const delegator = await Delegator.deploy(deployer.address);
+    await logVerify('Delegator', delegator, [deployer.address]);
 
     // Deploy voting
     const voting = await Voting.deploy(staking.address, delegator.address);
@@ -87,8 +96,8 @@ task('deploy:full', 'Creates full deployment')
     await logVerify('Treasury Implementation', treasuryImplementation, []);
 
     // Deploy ProxyAdmin
-    const proxyAdmin = await ProxyAdmin.deploy((await ethers.getSigners())[0].address);
-    await logVerify('Proxy Admin', proxyAdmin, [(await ethers.getSigners())[0].address]);
+    const proxyAdmin = await ProxyAdmin.deploy(deployer.address);
+    await logVerify('Proxy Admin', proxyAdmin, [deployer.address]);
 
     // Deploy treasury proxy
     const treasuryProxy = await Proxy.deploy(proxyAdmin.address);
@@ -117,21 +126,25 @@ task('deploy:full', 'Creates full deployment')
     console.log('\nInitializing contracts');
     await (await treasury.initializeTreasury(delegator.address)).wait();
     await (
-      await railgun.initializeRailgunLogic(
-        treasuryProxy.address,
-        25n,
-        25n,
-        25n,
-        (
-          await ethers.getSigners()
-        )[0].address,
-        { gasLimit: 2000000 },
-      )
+      await railgun.initializeRailgunLogic(treasuryProxy.address, 25n, 25n, 25n, deployer.address, {
+        gasLimit: 2000000,
+      })
     ).wait();
 
     // Set artifacts
     console.log('\nSetting Artifacts');
     await loadArtifacts(railgun, listArtifacts());
+
+    const shieldAuthorizationConfig = resolveShieldAuthorizationConfig({
+      bundlerParam: bundler,
+      defaultBundler: deployer.address,
+      defaultTrustedSigner: deployer.address,
+      getAddress: ethers.utils.getAddress,
+      trustedSignerParam: trustedsigner,
+    });
+
+    console.log('\nConfiguring shield authorization');
+    await configureShieldAuthorization(railgun, shieldAuthorizationConfig);
 
     // Transfer contract ownerships
     console.log('\nTransferring ownerships');
@@ -139,13 +152,7 @@ task('deploy:full', 'Creates full deployment')
     await (await proxyAdmin.transferOwnership(delegator.address)).wait();
     await (await delegator.transferOwnership(voting.address)).wait();
 
-    // Deploy RelayAdapt
-    console.log('\nDeploying Relay Adapt');
-    const relayAdapt = await RelayAdapt.deploy(proxy.address, weth9);
-    await logVerify('Relay Adapt', relayAdapt, [proxy.address, weth9]);
-
-    console.log('\nDEPLOY CONFIG:');
-    console.log({
+    const deployConfig = {
       delegator: delegator.address,
       governorRewardsImplementation: '',
       governorRewardsProxy: '',
@@ -157,6 +164,11 @@ task('deploy:full', 'Creates full deployment')
       treasuryImplementation: treasuryImplementation.address,
       treasuryProxy: treasuryProxy.address,
       voting: voting.address,
-      relayAdapt: relayAdapt.address,
-    });
+      bundler: shieldAuthorizationConfig.bundler,
+      trustedSigner: shieldAuthorizationConfig.trustedSigner,
+    };
+
+    console.log('\nDEPLOY CONFIG:');
+    console.log(deployConfig);
+    return deployConfig;
   });

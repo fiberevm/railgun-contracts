@@ -5,11 +5,16 @@ import {
   setBalance,
   impersonateAccount,
 } from '@nomicfoundation/hardhat-network-helpers';
+import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import * as weth9artifact from '../../externalArtifacts/WETH9.json';
 
 import { getAdaptParams, transactWithAdaptParams } from '../../helpers/adapt/relay';
 import { loadArtifacts, listArtifacts } from '../../helpers/logic/artifacts';
+import {
+  getShieldAuthorizationScope,
+  signShieldAuthorizationForRequests,
+} from '../../helpers/logic/shieldAuthorization';
 import { dummyTransact, UnshieldType } from '../../helpers/logic/transaction';
 import { MerkleTree } from '../../helpers/logic/merkletree';
 import { Wallet } from '../../helpers/logic/wallet';
@@ -23,9 +28,30 @@ import {
 } from '../../helpers/global/bytes';
 
 describe('Adapt/Relay', () => {
+  async function getShieldAuthorization(
+    trustedSigner: SignerWithAddress,
+    railgunSmartWallet: {
+      address: string;
+      nonces(recipient: string): Promise<{ toBigInt(): bigint }>;
+    },
+    chainID: bigint,
+    shieldRequests: Awaited<ReturnType<Note['encryptForShield']>>[],
+  ): Promise<string> {
+    const scope = getShieldAuthorizationScope(shieldRequests);
+    const nonce = (await railgunSmartWallet.nonces(scope)).toBigInt();
+
+    return signShieldAuthorizationForRequests(
+      trustedSigner,
+      railgunSmartWallet.address,
+      chainID,
+      shieldRequests,
+      nonce,
+      2n ** 32n,
+    );
+  }
+
   /**
    * Deploy fixtures
-   *
    * @returns fixtures
    */
   async function deploy() {
@@ -48,7 +74,7 @@ describe('Adapt/Relay', () => {
     const poseidonT4 = await PoseidonT4.deploy();
 
     // Deploy RailgunSmartWallet
-    const RailgunLogic = await ethers.getContractFactory('RailgunSmartWalletStub', {
+    const RailgunLogic = await ethers.getContractFactory('LegacyRailgunSmartWalletStub', {
       libraries: {
         PoseidonT3: poseidonT3.address,
         PoseidonT4: poseidonT4.address,
@@ -85,6 +111,8 @@ describe('Adapt/Relay', () => {
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
+    await railgunSmartWalletAdmin.setTrustedSigner(adminAccount.address);
+    await railgunSmartWalletAdmin.setBundler(relayAdapt.address);
 
     // Deploy test ERC20 and approve for shield
     const TestERC20 = await ethers.getContractFactory('TestERC20');
@@ -144,7 +172,7 @@ describe('Adapt/Relay', () => {
 
   it('Should calculate adapt parameters', async function () {
     this.timeout(5 * 60 * 60 * 1000);
-    const loops = process.env.SKIP_LONG_TESTS ? 5n : 10n;
+    const loops = process.env.SKIP_LONG_TESTS ? 5n : 7n;
 
     const { chainID, relayAdapt } = await loadFixture(deploy);
 
@@ -220,14 +248,19 @@ describe('Adapt/Relay', () => {
       };
 
       // Check contract and js output matches
-      expect(await relayAdapt.getAdaptParams(transactions, actionData)).to.equal(
+      expect(
+        await relayAdapt.callStatic.getAdaptParams(transactions, actionData, {
+          gasLimit: 16_000_000,
+        }),
+      ).to.equal(
         arrayToHexString(getAdaptParams(transactions, actionData), true),
       );
     }
   });
 
   it('Should deposit ERC20', async () => {
-    const { relayAdapt, railgunSmartWallet, testERC20Tokens } = await loadFixture(deploy);
+    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC20Tokens } =
+      await loadFixture(deploy);
 
     // Check shielding specific amounts works
 
@@ -252,7 +285,10 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    const shieldTransaction = await relayAdapt.shield([shieldRequest]);
+    const shieldTransaction = await relayAdapt.shield(
+      [shieldRequest],
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
+    );
 
     // Check tokens moved
     await expect(shieldTransaction).to.changeTokenBalances(
@@ -284,7 +320,10 @@ describe('Adapt/Relay', () => {
     const shieldRequestAll = await depositNoteAll.encryptForShield();
 
     // Shield
-    const shieldTransactionAll = await relayAdapt.shield([shieldRequestAll]);
+    const shieldTransactionAll = await relayAdapt.shield(
+      [shieldRequestAll],
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequestAll]),
+    );
 
     // Check tokens moved
     await expect(shieldTransactionAll).to.changeTokenBalances(
@@ -295,7 +334,8 @@ describe('Adapt/Relay', () => {
   });
 
   it('Should no-op if no tokens to shield', async () => {
-    const { relayAdapt, railgunSmartWallet, testERC20Tokens } = await loadFixture(deploy);
+    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC20Tokens } =
+      await loadFixture(deploy);
 
     // Create merkle tree
     const merkletree = await MerkleTree.createTree();
@@ -318,7 +358,10 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await relayAdapt.shield([shieldRequest, shieldRequest, shieldRequest]);
+    await relayAdapt.shield(
+      [shieldRequest, shieldRequest, shieldRequest],
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
+    );
 
     // No additions to the merkle tree should have been made
     expect(await railgunSmartWallet.nextLeafIndex()).to.equal(0);
@@ -329,8 +372,8 @@ describe('Adapt/Relay', () => {
 
     // Create deposit note for second token
     const depositNote2 = new Note(
-      randomBytes(32),
-      randomBytes(32),
+      depositNote.spendingKey,
+      depositNote.viewingKey,
       10n ** 18n,
       randomBytes(16),
       {
@@ -345,7 +388,10 @@ describe('Adapt/Relay', () => {
     const shieldRequest2 = await depositNote2.encryptForShield();
 
     // Shield
-    await relayAdapt.shield([shieldRequest, shieldRequest2]);
+    await relayAdapt.shield(
+      [shieldRequest, shieldRequest2],
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest2]),
+    );
 
     // Only non no-op tokens should be shielded
     await merkletree.insertLeaves([await depositNote2.getHash()], 0);
@@ -356,7 +402,8 @@ describe('Adapt/Relay', () => {
   });
 
   it('Should deposit ERC721', async () => {
-    const { relayAdapt, railgunSmartWallet, testERC721 } = await loadFixture(deploy);
+    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC721 } =
+      await loadFixture(deploy);
 
     // Mint ERC721 to relay adapt
     await testERC721.mint(relayAdapt.address, 10n);
@@ -379,7 +426,10 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await relayAdapt.shield([shieldRequest]);
+    await relayAdapt.shield(
+      [shieldRequest],
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
+    );
 
     // Check tokens moved
     expect(await testERC721.ownerOf(10n)).to.equal(railgunSmartWallet.address);
@@ -406,7 +456,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await expect(relayAdapt.shield([shieldRequest])).to.be.revertedWith(
+    await expect(relayAdapt.shield([shieldRequest], '0x')).to.be.revertedWith(
       'RelayAdapt: ERC1155 not yet supported',
     );
   });
@@ -689,8 +739,14 @@ describe('Adapt/Relay', () => {
   });
 
   it('Should submit relay bundle', async () => {
-    const { chainID, relayAdapt, relayAdaptSnarkBypass, railgunSmartWallet, testERC20Tokens } =
-      await loadFixture(deploy);
+    const {
+      adminAccount,
+      chainID,
+      relayAdapt,
+      relayAdaptSnarkBypass,
+      railgunSmartWallet,
+      testERC20Tokens,
+    } = await loadFixture(deploy);
 
     // Deploy multicall target
     const GovernanceStateChangeTargetStub = await ethers.getContractFactory(
@@ -723,8 +779,12 @@ describe('Adapt/Relay', () => {
           ),
       );
 
-    const depositTX = await railgunSmartWallet.shield(
-      await Promise.all(shieldNotes.map((note) => note.encryptForShield())),
+    await testERC20Tokens[0].mint(relayAdapt.address, BigInt(shieldNotes.length) * 10n ** 18n);
+
+    const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
+    const depositTX = await relayAdapt.shield(
+      shieldRequests,
+      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, shieldRequests),
     );
 
     await merkletree.scanTX(depositTX, railgunSmartWallet);

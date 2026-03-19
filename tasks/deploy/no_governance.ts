@@ -1,11 +1,11 @@
 import { task } from 'hardhat/config';
 
 import { listArtifacts, loadArtifacts } from '../../helpers/logic/artifacts';
+import { configureShieldAuthorization, resolveShieldAuthorizationConfig } from './shared';
 import type { Contract } from 'ethers';
 
 /**
  * Log data to verify contract
- *
  * @param name - name of contract
  * @param contract - contract object
  * @param constructorArguments - constructor arguments
@@ -28,10 +28,21 @@ task(
   'deploy:no_governance',
   'Creates deployment without governance (eg. for use in rollup deployments)',
 )
-  .addParam('weth9', 'Address of WETH9 wrapped base token contract')
-  .setAction(async function ({ weth9 }: { weth9: string }, hre) {
+  .addOptionalParam('bundler', 'Address allowed to call shield')
+  .addOptionalParam('trustedsigner', 'Address used to sign shield authorizations')
+  .setAction(async function (
+    {
+      bundler,
+      trustedsigner,
+    }: {
+      bundler?: string;
+      trustedsigner?: string;
+    },
+    hre,
+  ) {
     const { ethers } = hre;
     await hre.run('compile');
+    const [deployer] = await ethers.getSigners();
 
     // Get build artifacts
     const Delegator = await ethers.getContractFactory('Delegator');
@@ -39,7 +50,6 @@ task(
     const PoseidonT4 = await ethers.getContractFactory('PoseidonT4');
     const Proxy = await ethers.getContractFactory('PausableUpgradableProxy');
     const ProxyAdmin = await ethers.getContractFactory('ProxyAdmin');
-    const RelayAdapt = await ethers.getContractFactory('RelayAdapt');
     const TreasuryImplementation = await ethers.getContractFactory('Treasury');
 
     // Deploy Poseidon libraries
@@ -55,16 +65,16 @@ task(
     });
 
     // Deploy delegator
-    const delegator = await Delegator.deploy((await ethers.getSigners())[0].address);
-    await logVerify('Delegator', delegator, [(await ethers.getSigners())[0].address]);
+    const delegator = await Delegator.deploy(deployer.address);
+    await logVerify('Delegator', delegator, [deployer.address]);
 
     // Deploy treasury implementation
     const treasuryImplementation = await TreasuryImplementation.deploy();
     await logVerify('Treasury Implementation', treasuryImplementation, []);
 
     // Deploy ProxyAdmin
-    const proxyAdmin = await ProxyAdmin.deploy((await ethers.getSigners())[0].address);
-    await logVerify('Proxy Admin', proxyAdmin, [(await ethers.getSigners())[0].address]);
+    const proxyAdmin = await ProxyAdmin.deploy(deployer.address);
+    await logVerify('Proxy Admin', proxyAdmin, [deployer.address]);
 
     // Deploy treasury proxy
     const treasuryProxy = await Proxy.deploy(proxyAdmin.address);
@@ -93,34 +103,32 @@ task(
     console.log('\nInitializing contracts');
     await (await treasury.initializeTreasury(delegator.address)).wait();
     await (
-      await railgun.initializeRailgunLogic(
-        treasuryProxy.address,
-        0n,
-        0n,
-        0n,
-        (
-          await ethers.getSigners()
-        )[0].address,
-        { gasLimit: 2000000 },
-      )
+      await railgun.initializeRailgunLogic(treasuryProxy.address, 0n, 0n, 0n, deployer.address, {
+        gasLimit: 2000000,
+      })
     ).wait();
 
     // Set artifacts
     console.log('\nSetting Artifacts');
     await loadArtifacts(railgun, listArtifacts());
 
+    const shieldAuthorizationConfig = resolveShieldAuthorizationConfig({
+      bundlerParam: bundler,
+      defaultBundler: deployer.address,
+      defaultTrustedSigner: deployer.address,
+      getAddress: ethers.utils.getAddress,
+      trustedSignerParam: trustedsigner,
+    });
+
+    console.log('\nConfiguring shield authorization');
+    await configureShieldAuthorization(railgun, shieldAuthorizationConfig);
+
     // Transfer contract ownerships
     console.log('\nTransferring ownerships');
     await (await railgun.transferOwnership(delegator.address)).wait();
     await (await proxyAdmin.transferOwnership(delegator.address)).wait();
 
-    // Deploy RelayAdapt
-    console.log('\nDeploying Relay Adapt');
-    const relayAdapt = await RelayAdapt.deploy(proxy.address, weth9);
-    await logVerify('Relay Adapt', relayAdapt, [proxy.address, weth9]);
-
-    console.log('\nDEPLOY CONFIG:');
-    console.log({
+    const deployConfig = {
       delegator: delegator.address,
       governorRewardsImplementation: '',
       governorRewardsProxy: '',
@@ -132,6 +140,11 @@ task(
       treasuryImplementation: treasuryImplementation.address,
       treasuryProxy: treasuryProxy.address,
       voting: '',
-      relayAdapt: relayAdapt.address,
-    });
+      bundler: shieldAuthorizationConfig.bundler,
+      trustedSigner: shieldAuthorizationConfig.trustedSigner,
+    };
+
+    console.log('\nDEPLOY CONFIG:');
+    console.log(deployConfig);
+    return deployConfig;
   });

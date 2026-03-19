@@ -5,12 +5,11 @@ pragma abicoder v2;
 // OpenZeppelin v4
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { StorageSlot } from "@openzeppelin/contracts/utils/StorageSlot.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { SNARK_SCALAR_FIELD, TokenType, UnshieldType, TokenData, ShieldCiphertext, CommitmentCiphertext, CommitmentPreimage, Transaction } from "./Globals.sol";
+import { SNARK_SCALAR_FIELD, TokenType, UnshieldType, TokenData, ShieldCiphertext, CommitmentCiphertext, CommitmentPreimage, ShieldRequest, Transaction } from "./Globals.sol";
 
 import { Verifier } from "./Verifier.sol";
 import { Commitments } from "./Commitments.sol";
@@ -26,6 +25,15 @@ import { PoseidonT4 } from "./Poseidon.sol";
  */
 contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBlocklist, Verifier {
   using SafeERC20 for IERC20;
+  bytes32 private constant EIP712_DOMAIN_TYPEHASH =
+    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+  bytes32 private constant SHIELD_AUTHORIZATION_TYPEHASH =
+    keccak256("ShieldAuthorization(bytes32 scope,uint256 nonce,uint256 expiry)");
+  bytes32 private constant EIP712_NAME_HASH = keccak256("RAILGUN");
+  bytes32 private constant EIP712_VERSION_HASH = keccak256("1");
+  uint256 private constant SHIELD_AUTHORIZATION_LENGTH = 129;
+  uint256 private constant SECP256K1N_DIV_2 =
+    0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0;
 
   // NOTE: The order of instantiation MUST stay the same across upgrades
   // add new variables to the bottom of the list
@@ -52,9 +60,26 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   // Last event block - to assist with scanning
   uint256 public lastEventBlock;
 
+  address public bundler;
+  address public trustedSigner;
+  mapping(bytes32 => uint256) public nonces;
+
+  error InvalidBundler(address account);
+  error InvalidShieldAuthorization(address signer);
+  error ShieldAuthorizationExpired(uint256 expiry);
+  error ShieldAuthorizationNonceMismatch(
+    bytes32 scope,
+    uint256 expectedNonce,
+    uint256 providedNonce
+  );
+  error ContractCallerNotAllowed(address account);
+
   // Treasury events
   event TreasuryChange(address treasury);
   event FeeChange(uint256 shieldFee, uint256 unshieldFee, uint256 nftFee);
+
+  event BundlerChanged(address indexed newBundler);
+  event TrustedSignerChanged(address indexed newTrustedSigner);
 
   // Transaction events
   event Transact(
@@ -360,9 +385,10 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
    */
   function checkSafetyVectors() external {
     // Set safety bit
-    StorageSlot
-      .getBooleanSlot(0x8dea8703c3cf94703383ce38a9c894669dccd4ca8e65ddb43267aa0248711450)
-      .value = true;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      sstore(0x8dea8703c3cf94703383ce38a9c894669dccd4ca8e65ddb43267aa0248711450, 1)
+    }
 
     // Setup behavior check
     bool result = false;
@@ -533,5 +559,105 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
     return _commitmentsStartOffset + _transaction.boundParams.commitmentCiphertext.length;
   }
 
-  uint256[43] private __gap;
+  function setBundler(address _bundler) external onlyOwner {
+    if (bundler != _bundler) {
+      bundler = _bundler;
+      emit BundlerChanged(_bundler);
+    }
+  }
+
+  /**
+   * @notice Sets the trusted signer used for shield authorization.
+   * @param _signer - Address permitted to sign shield authorizations.
+   */
+  function setTrustedSigner(address _signer) external onlyOwner {
+    if (trustedSigner != _signer) {
+      trustedSigner = _signer;
+      emit TrustedSignerChanged(_signer);
+    }
+  }
+
+  function _getShieldAuthorizationScope(
+    ShieldRequest[] calldata _shieldRequests
+  ) internal pure returns (bytes32 scope) {
+    for (uint256 i = 0; i < _shieldRequests.length; i += 1) {
+      scope = keccak256(abi.encodePacked(scope, _shieldRequests[i].preimage.npk));
+    }
+  }
+
+  modifier onlyExternallyOwnedCaller() {
+    _requireExternallyOwnedCaller(msg.sender);
+    _;
+  }
+
+  function _requireExternallyOwnedCaller(address _account) internal view {
+    // The proof does not bind note ownership to the immediate caller, so contract wrappers
+    // would let arbitrary users borrow the wrapper's identity for transaction submission.
+    // solhint-disable-next-line avoid-tx-origin
+    if (_account != tx.origin) revert ContractCallerNotAllowed(_account);
+  }
+
+  function _requireShieldAuthorization(
+    bytes32 _scope,
+    bytes calldata _authorization
+  ) internal {
+    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
+
+    if (_authorization.length != SHIELD_AUTHORIZATION_LENGTH) {
+      revert InvalidShieldAuthorization(address(0));
+    }
+
+    uint256 nonce;
+    uint256 expiry;
+    bytes32 r;
+    bytes32 s;
+    uint8 v;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      nonce := calldataload(_authorization.offset)
+      expiry := calldataload(add(_authorization.offset, 0x20))
+      r := calldataload(add(_authorization.offset, 0x40))
+      s := calldataload(add(_authorization.offset, 0x60))
+      v := byte(0, calldataload(add(_authorization.offset, 0x80)))
+    }
+
+    if (block.timestamp >= expiry) revert ShieldAuthorizationExpired(expiry);
+
+    uint256 expectedNonce = nonces[_scope];
+    if (nonce != expectedNonce) {
+      revert ShieldAuthorizationNonceMismatch(_scope, expectedNonce, nonce);
+    }
+
+    if (uint256(s) > SECP256K1N_DIV_2 || (v != 27 && v != 28)) {
+      revert InvalidShieldAuthorization(address(0));
+    }
+
+    bytes32 structHash = keccak256(
+      abi.encode(SHIELD_AUTHORIZATION_TYPEHASH, _scope, nonce, expiry)
+    );
+    bytes32 digest = keccak256(
+      abi.encodePacked("\x19\x01", _domainSeparatorV4(), structHash)
+    );
+    address signer = ecrecover(digest, v, r, s);
+    if (signer == address(0) || signer != trustedSigner) {
+      revert InvalidShieldAuthorization(signer);
+    }
+
+    nonces[_scope] = expectedNonce + 1;
+  }
+
+  function _domainSeparatorV4() internal view returns (bytes32) {
+    return
+      keccak256(
+        abi.encode(
+          EIP712_DOMAIN_TYPEHASH,
+          EIP712_NAME_HASH,
+          EIP712_VERSION_HASH,
+          block.chainid,
+          address(this)
+        )
+      );
+  }
+
+  uint256[41] private __gap;
 }

@@ -78,8 +78,12 @@ contract RelayAdapt {
   /**
    * @notice Executes a batch of Railgun shields
    * @param _shieldRequests - Tokens to shield
+   * @param _authorization - Encoded shield authorization for the recipient batch.
    */
-  function shield(ShieldRequest[] calldata _shieldRequests) external onlySelfIfExecuting {
+  function shield(
+    ShieldRequest[] calldata _shieldRequests,
+    bytes calldata _authorization
+  ) external onlySelfIfExecuting {
     // Loop through each token specified for shield and shield requested balance
 
     uint256 numValidTokens = 0;
@@ -99,12 +103,15 @@ contract RelayAdapt {
           values[i] = _shieldRequests[i].preimage.value;
         }
 
-        // Approve the balance for shield
+        // Approve enough allowance for the entire batch. Multiple shield requests can target
+        // the same token, so per-request exact approvals would overwrite earlier allowance.
         // Set to 0 first for the following reasons:
         // https://github.com/Uniswap/interface/issues/1034
         // https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-        token.safeApprove(address(railgun), 0);
-        token.safeApprove(address(railgun), values[i]);
+        if (values[i] > 0 && token.allowance(address(this), address(railgun)) < values[i]) {
+          token.safeApprove(address(railgun), 0);
+          token.safeApprove(address(railgun), type(uint256).max);
+        }
 
         // Increment number of valid tokens if we have a balance to deposit
         if (values[i] > 0) {
@@ -154,7 +161,7 @@ contract RelayAdapt {
     }
 
     // Shield to railgun
-    railgun.shield(filteredShieldRequests);
+    railgun.shield(filteredShieldRequests, _authorization);
   }
 
   /**
