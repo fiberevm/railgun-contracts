@@ -9,7 +9,7 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { SNARK_SCALAR_FIELD, TokenType, UnshieldType, TokenData, ShieldCiphertext, CommitmentCiphertext, CommitmentPreimage, ShieldRequest, Transaction } from "./Globals.sol";
+import { SNARK_SCALAR_FIELD, TokenType, UnshieldType, TokenData, ShieldCiphertext, CommitmentCiphertext, CommitmentPreimage, Transaction } from "./Globals.sol";
 
 import { Verifier } from "./Verifier.sol";
 import { Commitments } from "./Commitments.sol";

@@ -2,8 +2,6 @@ interface BundlerConfig {
   bundler: string;
 }
 
-export const VERIFICATION_BYPASS_ADDRESS = '0x000000000000000000000000000000000000dEaD';
-
 type AddressNormalizer = (address: string) => string;
 
 interface BundlerInputs {

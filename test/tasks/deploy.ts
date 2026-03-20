@@ -7,7 +7,7 @@ import {
 } from '@nomicfoundation/hardhat-network-helpers';
 import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-import { VERIFICATION_BYPASS_ADDRESS } from '../../tasks/deploy/shared';
+const VERIFICATION_BYPASS_ADDRESS = '0x000000000000000000000000000000000000dEaD';
 
 interface BaseDeployConfig {
   bundler: string;
@@ -68,7 +68,6 @@ async function deployTestFixture() {
  */
 async function deployNoGovernanceFixture() {
   const signers = await getTaskSigners();
-  const deployer = signers[0];
   const additionalUser = signers[1];
   const config = (await hre.run('deploy:no_governance', {
     bundler: additionalUser.address,
@@ -89,7 +88,6 @@ async function deployNoGovernanceFixture() {
  */
 async function deployFullFixture() {
   const signers = await getTaskSigners();
-  const deployer = signers[0];
   const additionalUser = signers[1];
   const config = (await hre.run('deploy:full', {
     bundler: additionalUser.address,
@@ -132,7 +130,6 @@ describe('Tasks/Deploy', () => {
 
   it('configures a usable bundler before transfer in deploy:no_governance', async () => {
     const signers = await getTaskSigners();
-    const deployer = signers[0];
     const additionalUser = signers[1];
 
     const { deployConfig, proxyAdmin, railgun } = await loadFixture(deployNoGovernanceFixture);
@@ -146,7 +143,6 @@ describe('Tasks/Deploy', () => {
 
   it('configures the bundler before governance handoff in deploy:full', async () => {
     const signers = await getTaskSigners();
-    const deployer = signers[0];
     const additionalUser = signers[1];
 
     const { delegator, deployConfig, proxyAdmin, railgun } = await loadFixture(deployFullFixture);
