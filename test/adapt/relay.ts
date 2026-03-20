@@ -80,12 +80,10 @@ describe('Adapt/Relay', () => {
     const railgunSmartWalletSnarkBypass = railgunSmartWallet.connect(snarkBypassSigner);
     const railgunSmartWalletAdmin = railgunSmartWallet.connect(adminAccount);
     const relayAdaptSnarkBypass = relayAdapt.connect(snarkBypassSigner);
-    const relayAdaptAdmin = relayAdapt.connect(adminAccount);
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
     await railgunSmartWalletAdmin.setBundler(relayAdapt.address);
-    await railgunSmartWalletAdmin.setRelayAdapt(relayAdapt.address);
 
     // Deploy test ERC20 and approve for shield
     const TestERC20 = await ethers.getContractFactory('TestERC20');
@@ -134,7 +132,6 @@ describe('Adapt/Relay', () => {
       railgunSmartWalletAdmin,
       relayAdapt,
       relayAdaptSnarkBypass,
-      relayAdaptAdmin,
       testERC20Tokens,
       testERC20TokensBypassSigner,
       testERC721,
@@ -696,7 +693,7 @@ describe('Adapt/Relay', () => {
     ).to.be.revertedWithCustomError(relayAdapt, 'CallFailed');
   });
 
-  it('Should submit relay bundle', async () => {
+  it('Should reject relay bundle submission because transact is EOA-only', async () => {
     const {
       adminAccount,
       chainID,
@@ -805,14 +802,10 @@ describe('Adapt/Relay', () => {
       relayAdapt.relay(transactionsWrongAdaptID, actionData, { gasLimit: 11000000n }),
     ).to.be.revertedWith('RelayAdapt: AdaptID Parameters Mismatch');
 
-    // Submit transaction
-    const relayTX = await relayAdapt.relay(transactions, actionData, { gasLimit: 11000000n });
-
-    // Check effects have been applied
-    expect(await governanceStateChangeTargetStub.greeting()).to.equal('hi');
-
-    await merkletree.scanTX(relayTX, railgunSmartWallet);
-    await wallet.scanTX(relayTX, railgunSmartWallet);
+    await expect(relayAdapt.relay(transactions, actionData, { gasLimit: 11000000n }))
+      .to.be.revertedWithCustomError(railgunSmartWallet, 'ContractCallerNotAllowed')
+      .withArgs(relayAdapt.address);
+    expect(await governanceStateChangeTargetStub.greeting()).to.equal('hello');
 
     // Verification bypass address shouldn't revert
     // Generate transaction bundle and actions
@@ -846,7 +839,8 @@ describe('Adapt/Relay', () => {
       ),
     ];
 
-    await expect(relayAdaptSnarkBypass.relay(transactionsSnarkBypass, actionDataNoOp)).to.eventually
-      .be.fulfilled;
+    await expect(relayAdaptSnarkBypass.relay(transactionsSnarkBypass, actionDataNoOp))
+      .to.be.revertedWithCustomError(railgunSmartWallet, 'ContractCallerNotAllowed')
+      .withArgs(relayAdapt.address);
   });
 });

@@ -76,7 +76,7 @@ describe('Logic/BundlerShield', () => {
     return shieldNote.encryptForShield();
   }
 
-  it('Should allow owner to set bundler and relayAdapt', async () => {
+  it('Should allow owner to set bundler', async () => {
     const { railgun, railgunAdmin, user1, nonOwner } = await loadFixture(deploy);
 
     await expect(railgunAdmin.setBundler(user1.address))
@@ -84,15 +84,7 @@ describe('Logic/BundlerShield', () => {
       .withArgs(user1.address);
     expect(await railgun.bundler()).to.equal(user1.address);
 
-    await expect(railgunAdmin.setRelayAdapt(user1.address))
-      .to.emit(railgun, 'RelayAdaptChanged')
-      .withArgs(user1.address);
-    expect(await railgun.relayAdapt()).to.equal(user1.address);
-
     await expect(railgun.connect(nonOwner).setBundler(nonOwner.address)).to.be.revertedWith(
-      'Ownable: caller is not the owner',
-    );
-    await expect(railgun.connect(nonOwner).setRelayAdapt(nonOwner.address)).to.be.revertedWith(
       'Ownable: caller is not the owner',
     );
   });
@@ -113,25 +105,8 @@ describe('Logic/BundlerShield', () => {
       .withArgs(user1.address);
   });
 
-  it('Should allow RelayAdapt to shield when configured as bundler', async () => {
-    const { railgun, railgunAdmin, testERC20 } = await loadFixture(deploy);
-    const shieldRequest = await buildShieldRequest(testERC20.address);
-
-    const RelayAdapt = await ethers.getContractFactory('RelayAdapt');
-    const relayAdapt = await RelayAdapt.deploy(railgun.address, railgun.address);
-
-    await railgunAdmin.setBundler(relayAdapt.address);
-    await testERC20.mint(relayAdapt.address, 10n ** 18n);
-
-    await expect(relayAdapt.shield([shieldRequest])).to.changeTokenBalances(
-      testERC20,
-      [relayAdapt.address, railgun.address],
-      [-(10n ** 18n), 10n ** 18n],
-    );
-  });
-
-  it('Should allow EOAs to transact, block arbitrary contracts, and permit configured RelayAdapt', async () => {
-    const { railgun, railgunAdmin, snarkBypassSigner, user1 } = await loadFixture(deploy);
+  it('Should allow EOAs to transact and block arbitrary contracts', async () => {
+    const { railgun, snarkBypassSigner, user1 } = await loadFixture(deploy);
 
     await expect(railgun.connect(user1).transact([])).to.not.be.reverted;
     await expect(railgun.connect(snarkBypassSigner).transact([])).to.not.be.reverted;
@@ -148,8 +123,5 @@ describe('Logic/BundlerShield', () => {
     await expect(relayAdapt.relay([], actionData))
       .to.be.revertedWithCustomError(railgun, 'ContractCallerNotAllowed')
       .withArgs(relayAdapt.address);
-
-    await railgunAdmin.setRelayAdapt(relayAdapt.address);
-    await expect(relayAdapt.relay([], actionData)).to.not.be.reverted;
   });
 });

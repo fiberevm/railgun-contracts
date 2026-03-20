@@ -52,7 +52,6 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   uint256 public lastEventBlock;
 
   address public bundler;
-  address public relayAdapt;
 
   error InvalidBundler(address account);
   error ContractCallerNotAllowed(address account);
@@ -62,7 +61,6 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   event FeeChange(uint256 shieldFee, uint256 unshieldFee, uint256 nftFee);
 
   event BundlerChanged(address indexed newBundler);
-  event RelayAdaptChanged(address indexed newRelayAdapt);
 
   // Transaction events
   event Transact(
@@ -549,27 +547,15 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
     }
   }
 
-  function setRelayAdapt(address _relayAdapt) external onlyOwner {
-    if (relayAdapt != _relayAdapt) {
-      relayAdapt = _relayAdapt;
-      emit RelayAdaptChanged(_relayAdapt);
-    }
-  }
-
   modifier onlyExternallyOwnedCaller() {
     _requireExternallyOwnedCaller(msg.sender);
     _;
   }
 
   function _requireExternallyOwnedCaller(address _account) internal view {
-    // RelayAdapt remains an owner-controlled exception for SDK flows that submit transact
-    // batches through the adapter contract. All other contract callers stay blocked because
-    // the proof does not bind note ownership to the immediate caller.
-    if (_account == relayAdapt) return;
-
     // solhint-disable-next-line avoid-tx-origin
     if (_account != tx.origin) revert ContractCallerNotAllowed(_account);
   }
 
-  uint256[42] private __gap;
+  uint256[43] private __gap;
 }
