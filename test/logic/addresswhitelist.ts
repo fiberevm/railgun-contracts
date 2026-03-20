@@ -40,18 +40,25 @@ describe('Logic/BundlerShield', () => {
 
     const TestERC20 = await ethers.getContractFactory('TestERC20');
     const testERC20 = await TestERC20.deploy();
+    const commodityERC20 = await TestERC20.deploy();
+    const SimpleSwap = await ethers.getContractFactory('SimpleSwap');
+    const simpleSwap = await SimpleSwap.deploy();
+
     await testERC20.mint(bundler.address, 2n ** 128n - 1n);
     await testERC20.mint(user1.address, 2n ** 128n - 1n);
+    await commodityERC20.mint(simpleSwap.address, 2n ** 128n - 1n);
     await testERC20.connect(bundler).approve(railgun.address, 2n ** 256n - 1n);
     await testERC20.connect(user1).approve(railgun.address, 2n ** 256n - 1n);
 
     return {
       bundler,
+      commodityERC20,
       nonOwner,
       owner,
       railgun,
       railgunAdmin,
       snarkBypassSigner,
+      simpleSwap,
       testERC20,
       user1,
     };
@@ -103,6 +110,27 @@ describe('Logic/BundlerShield', () => {
     await expect(railgun.connect(user1).shield([shieldRequest]))
       .to.be.revertedWithCustomError(railgun, 'InvalidBundler')
       .withArgs(user1.address);
+  });
+
+  it('Should allow the bundler to reshield plain ERC20 swap output', async () => {
+    const { bundler, commodityERC20, railgun, simpleSwap, testERC20 } = await loadFixture(deploy);
+    const shieldRequest = await buildShieldRequest(commodityERC20.address);
+    const swapAmount = 10n ** 18n;
+
+    await testERC20.connect(bundler).approve(simpleSwap.address, swapAmount);
+    await simpleSwap.connect(bundler).swap(
+      testERC20.address,
+      commodityERC20.address,
+      swapAmount,
+      10000,
+    );
+    await commodityERC20.connect(bundler).approve(railgun.address, swapAmount);
+
+    await expect(railgun.connect(bundler).shield([shieldRequest])).to.changeTokenBalances(
+      commodityERC20,
+      [bundler.address, railgun.address],
+      [-swapAmount, swapAmount],
+    );
   });
 
   it('Should allow EOAs to transact and block arbitrary contracts', async () => {

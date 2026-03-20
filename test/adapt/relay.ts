@@ -83,7 +83,7 @@ describe('Adapt/Relay', () => {
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
-    await railgunSmartWalletAdmin.setBundler(relayAdapt.address);
+    await railgunSmartWalletAdmin.setBundler(primaryAccount.address);
 
     // Deploy test ERC20 and approve for shield
     const TestERC20 = await ethers.getContractFactory('TestERC20');
@@ -228,16 +228,11 @@ describe('Adapt/Relay', () => {
     }
   });
 
-  it('Should deposit ERC20', async () => {
-    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC20Tokens } =
-      await loadFixture(deploy);
+  it('Should reject shielding through RelayAdapt because it is not the bundler', async () => {
+    const { relayAdapt, railgunSmartWallet, testERC20Tokens } = await loadFixture(deploy);
 
-    // Check shielding specific amounts works
-
-    // Mint test tokens to relayAdapt
     await testERC20Tokens[0].mint(relayAdapt.address, 10n ** 18n);
 
-    // Create deposit note
     const depositNote = new Note(
       randomBytes(32),
       randomBytes(32),
@@ -251,169 +246,11 @@ describe('Adapt/Relay', () => {
       '',
     );
 
-    // Get shield request
     const shieldRequest = await depositNote.encryptForShield();
 
-    // Shield
-    const shieldTransaction = await relayAdapt.shield([shieldRequest]);
-
-    // Check tokens moved
-    await expect(shieldTransaction).to.changeTokenBalances(
-      testERC20Tokens[0],
-      [relayAdapt.address, railgunSmartWallet.address],
-      [-(10n ** 18n), 10n ** 18n],
-    );
-
-    // Mint test tokens to relayAdapt
-    await testERC20Tokens[0].mint(relayAdapt.address, 2n * 10n ** 18n);
-
-    // Check shielding entire balance works
-
-    // Create deposit note with 0 value
-    const depositNoteAll = new Note(
-      randomBytes(32),
-      randomBytes(32),
-      0n,
-      randomBytes(16),
-      {
-        tokenType: TokenType.ERC20,
-        tokenAddress: testERC20Tokens[0].address,
-        tokenSubID: 0n,
-      },
-      '',
-    );
-
-    // Get shield request
-    const shieldRequestAll = await depositNoteAll.encryptForShield();
-
-    // Shield
-    const shieldTransactionAll = await relayAdapt.shield([shieldRequestAll]);
-
-    // Check tokens moved
-    await expect(shieldTransactionAll).to.changeTokenBalances(
-      testERC20Tokens[0],
-      [relayAdapt.address, railgunSmartWallet.address],
-      [-(2n * 10n ** 18n), 2n * 10n ** 18n],
-    );
-  });
-
-  it('Should no-op if no tokens to shield', async () => {
-    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC20Tokens } =
-      await loadFixture(deploy);
-
-    // Create merkle tree
-    const merkletree = await MerkleTree.createTree();
-
-    // Create deposit note
-    const depositNote = new Note(
-      randomBytes(32),
-      randomBytes(32),
-      0n,
-      randomBytes(16),
-      {
-        tokenType: TokenType.ERC20,
-        tokenAddress: testERC20Tokens[0].address,
-        tokenSubID: 0n,
-      },
-      '',
-    );
-
-    // Get shield request
-    const shieldRequest = await depositNote.encryptForShield();
-
-    // Shield
-    await relayAdapt.shield([shieldRequest, shieldRequest, shieldRequest]);
-
-    // No additions to the merkle tree should have been made
-    expect(await railgunSmartWallet.nextLeafIndex()).to.equal(0);
-    expect(await railgunSmartWallet.merkleRoot()).to.equal(arrayToHexString(merkletree.root, true));
-
-    // Transfer tokens to contract
-    await testERC20Tokens[1].mint(relayAdapt.address, 10n ** 18n);
-
-    // Create deposit note for second token
-    const depositNote2 = new Note(
-      depositNote.spendingKey,
-      depositNote.viewingKey,
-      10n ** 18n,
-      randomBytes(16),
-      {
-        tokenType: TokenType.ERC20,
-        tokenAddress: testERC20Tokens[1].address,
-        tokenSubID: 0n,
-      },
-      '',
-    );
-
-    // Get shield request
-    const shieldRequest2 = await depositNote2.encryptForShield();
-
-    // Shield
-    await relayAdapt.shield([shieldRequest, shieldRequest2]);
-
-    // Only non no-op tokens should be shielded
-    await merkletree.insertLeaves([await depositNote2.getHash()], 0);
-
-    // Check only non no-op tokens were added to tree
-    expect(await railgunSmartWallet.nextLeafIndex()).to.equal(1);
-    expect(await railgunSmartWallet.merkleRoot()).to.equal(arrayToHexString(merkletree.root, true));
-  });
-
-  it('Should deposit ERC721', async () => {
-    const { adminAccount, chainID, relayAdapt, railgunSmartWallet, testERC721 } =
-      await loadFixture(deploy);
-
-    // Mint ERC721 to relay adapt
-    await testERC721.mint(relayAdapt.address, 10n);
-
-    // Create deposit note
-    const depositNote = new Note(
-      randomBytes(32),
-      randomBytes(32),
-      10n ** 18n,
-      randomBytes(16),
-      {
-        tokenType: TokenType.ERC721,
-        tokenAddress: testERC721.address,
-        tokenSubID: 10n,
-      },
-      '',
-    );
-
-    // Get shield request
-    const shieldRequest = await depositNote.encryptForShield();
-
-    // Shield
-    await relayAdapt.shield([shieldRequest]);
-
-    // Check tokens moved
-    expect(await testERC721.ownerOf(10n)).to.equal(railgunSmartWallet.address);
-  });
-
-  it('Should fail on ERC1155', async () => {
-    const { relayAdapt } = await loadFixture(deploy);
-
-    // Create deposit note
-    const depositNote = new Note(
-      randomBytes(32),
-      randomBytes(32),
-      10n ** 18n,
-      randomBytes(16),
-      {
-        tokenType: TokenType.ERC1155,
-        tokenAddress: arrayToHexString(randomBytes(20), true),
-        tokenSubID: 10n,
-      },
-      '',
-    );
-
-    // Get shield request
-    const shieldRequest = await depositNote.encryptForShield();
-
-    // Shield
-    await expect(relayAdapt.shield([shieldRequest])).to.be.revertedWith(
-      'RelayAdapt: ERC1155 not yet supported',
-    );
+    await expect(relayAdapt.shield([shieldRequest]))
+      .to.be.revertedWithCustomError(railgunSmartWallet, 'InvalidBundler')
+      .withArgs(relayAdapt.address);
   });
 
   it('Should transfer tokens', async () => {
@@ -695,8 +532,8 @@ describe('Adapt/Relay', () => {
 
   it('Should reject relay bundle submission because transact is EOA-only', async () => {
     const {
-      adminAccount,
       chainID,
+      primaryAccount,
       relayAdapt,
       relayAdaptSnarkBypass,
       railgunSmartWallet,
@@ -734,10 +571,8 @@ describe('Adapt/Relay', () => {
           ),
       );
 
-    await testERC20Tokens[0].mint(relayAdapt.address, BigInt(shieldNotes.length) * 10n ** 18n);
-
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
-    const depositTX = await relayAdapt.shield(shieldRequests);
+    const depositTX = await railgunSmartWallet.connect(primaryAccount).shield(shieldRequests);
 
     await merkletree.scanTX(depositTX, railgunSmartWallet);
     await wallet.scanTX(depositTX, railgunSmartWallet);
