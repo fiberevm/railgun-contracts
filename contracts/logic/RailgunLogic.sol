@@ -25,15 +25,6 @@ import { PoseidonT4 } from "./Poseidon.sol";
  */
 contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBlocklist, Verifier {
   using SafeERC20 for IERC20;
-  bytes32 private constant EIP712_DOMAIN_TYPEHASH =
-    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-  bytes32 private constant SHIELD_AUTHORIZATION_TYPEHASH =
-    keccak256("ShieldAuthorization(bytes32 scope,uint256 nonce,uint256 expiry)");
-  bytes32 private constant EIP712_NAME_HASH = keccak256("RAILGUN");
-  bytes32 private constant EIP712_VERSION_HASH = keccak256("1");
-  uint256 private constant SHIELD_AUTHORIZATION_LENGTH = 129;
-  uint256 private constant SECP256K1N_DIV_2 =
-    0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0;
 
   // NOTE: The order of instantiation MUST stay the same across upgrades
   // add new variables to the bottom of the list
@@ -61,17 +52,9 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   uint256 public lastEventBlock;
 
   address public bundler;
-  address public trustedSigner;
-  mapping(bytes32 => uint256) public nonces;
+  address public relayAdapt;
 
   error InvalidBundler(address account);
-  error InvalidShieldAuthorization(address signer);
-  error ShieldAuthorizationExpired(uint256 expiry);
-  error ShieldAuthorizationNonceMismatch(
-    bytes32 scope,
-    uint256 expectedNonce,
-    uint256 providedNonce
-  );
   error ContractCallerNotAllowed(address account);
 
   // Treasury events
@@ -79,7 +62,7 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   event FeeChange(uint256 shieldFee, uint256 unshieldFee, uint256 nftFee);
 
   event BundlerChanged(address indexed newBundler);
-  event TrustedSignerChanged(address indexed newTrustedSigner);
+  event RelayAdaptChanged(address indexed newRelayAdapt);
 
   // Transaction events
   event Transact(
@@ -566,22 +549,10 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
     }
   }
 
-  /**
-   * @notice Sets the trusted signer used for shield authorization.
-   * @param _signer - Address permitted to sign shield authorizations.
-   */
-  function setTrustedSigner(address _signer) external onlyOwner {
-    if (trustedSigner != _signer) {
-      trustedSigner = _signer;
-      emit TrustedSignerChanged(_signer);
-    }
-  }
-
-  function _getShieldAuthorizationScope(
-    ShieldRequest[] calldata _shieldRequests
-  ) internal pure returns (bytes32 scope) {
-    for (uint256 i = 0; i < _shieldRequests.length; i += 1) {
-      scope = keccak256(abi.encodePacked(scope, _shieldRequests[i].preimage.npk));
+  function setRelayAdapt(address _relayAdapt) external onlyOwner {
+    if (relayAdapt != _relayAdapt) {
+      relayAdapt = _relayAdapt;
+      emit RelayAdaptChanged(_relayAdapt);
     }
   }
 
@@ -591,73 +562,14 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   }
 
   function _requireExternallyOwnedCaller(address _account) internal view {
-    // The proof does not bind note ownership to the immediate caller, so contract wrappers
-    // would let arbitrary users borrow the wrapper's identity for transaction submission.
+    // RelayAdapt remains an owner-controlled exception for SDK flows that submit transact
+    // batches through the adapter contract. All other contract callers stay blocked because
+    // the proof does not bind note ownership to the immediate caller.
+    if (_account == relayAdapt) return;
+
     // solhint-disable-next-line avoid-tx-origin
     if (_account != tx.origin) revert ContractCallerNotAllowed(_account);
   }
 
-  function _requireShieldAuthorization(
-    bytes32 _scope,
-    bytes calldata _authorization
-  ) internal {
-    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
-
-    if (_authorization.length != SHIELD_AUTHORIZATION_LENGTH) {
-      revert InvalidShieldAuthorization(address(0));
-    }
-
-    uint256 nonce;
-    uint256 expiry;
-    bytes32 r;
-    bytes32 s;
-    uint8 v;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      nonce := calldataload(_authorization.offset)
-      expiry := calldataload(add(_authorization.offset, 0x20))
-      r := calldataload(add(_authorization.offset, 0x40))
-      s := calldataload(add(_authorization.offset, 0x60))
-      v := byte(0, calldataload(add(_authorization.offset, 0x80)))
-    }
-
-    if (block.timestamp >= expiry) revert ShieldAuthorizationExpired(expiry);
-
-    uint256 expectedNonce = nonces[_scope];
-    if (nonce != expectedNonce) {
-      revert ShieldAuthorizationNonceMismatch(_scope, expectedNonce, nonce);
-    }
-
-    if (uint256(s) > SECP256K1N_DIV_2 || (v != 27 && v != 28)) {
-      revert InvalidShieldAuthorization(address(0));
-    }
-
-    bytes32 structHash = keccak256(
-      abi.encode(SHIELD_AUTHORIZATION_TYPEHASH, _scope, nonce, expiry)
-    );
-    bytes32 digest = keccak256(
-      abi.encodePacked("\x19\x01", _domainSeparatorV4(), structHash)
-    );
-    address signer = ecrecover(digest, v, r, s);
-    if (signer == address(0) || signer != trustedSigner) {
-      revert InvalidShieldAuthorization(signer);
-    }
-
-    nonces[_scope] = expectedNonce + 1;
-  }
-
-  function _domainSeparatorV4() internal view returns (bytes32) {
-    return
-      keccak256(
-        abi.encode(
-          EIP712_DOMAIN_TYPEHASH,
-          EIP712_NAME_HASH,
-          EIP712_VERSION_HASH,
-          block.chainid,
-          address(this)
-        )
-      );
-  }
-
-  uint256[41] private __gap;
+  uint256[42] private __gap;
 }

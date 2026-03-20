@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config';
 
 import { loadArtifacts, listArtifacts } from '../../helpers/logic/artifacts';
-import { configureShieldAuthorization, resolveShieldAuthorizationConfig } from './shared';
+import { configureBundler, resolveBundlerConfig } from './shared';
 import type { Contract } from 'ethers';
 
 /**
@@ -28,18 +28,15 @@ task('deploy:full', 'Creates full deployment')
   .addParam('railName', 'Name of Rail ERC20 governance token')
   .addParam('railSymbol', 'Symbol of Rail ERC20 governance token')
   .addOptionalParam('bundler', 'Address allowed to call shield')
-  .addOptionalParam('trustedsigner', 'Address used to sign shield authorizations')
   .setAction(async function (
     {
       railName,
       railSymbol,
       bundler,
-      trustedsigner,
     }: {
       railName: string;
       railSymbol: string;
       bundler?: string;
-      trustedsigner?: string;
     },
     hre,
   ) {
@@ -135,16 +132,14 @@ task('deploy:full', 'Creates full deployment')
     console.log('\nSetting Artifacts');
     await loadArtifacts(railgun, listArtifacts());
 
-    const shieldAuthorizationConfig = resolveShieldAuthorizationConfig({
+    const bundlerConfig = resolveBundlerConfig({
       bundlerParam: bundler,
       defaultBundler: deployer.address,
-      defaultTrustedSigner: deployer.address,
       getAddress: ethers.utils.getAddress,
-      trustedSignerParam: trustedsigner,
     });
 
-    console.log('\nConfiguring shield authorization');
-    await configureShieldAuthorization(railgun, shieldAuthorizationConfig);
+    console.log('\nConfiguring bundler');
+    await configureBundler(railgun, bundlerConfig);
 
     // Transfer contract ownerships
     console.log('\nTransferring ownerships');
@@ -164,8 +159,7 @@ task('deploy:full', 'Creates full deployment')
       treasuryImplementation: treasuryImplementation.address,
       treasuryProxy: treasuryProxy.address,
       voting: voting.address,
-      bundler: shieldAuthorizationConfig.bundler,
-      trustedSigner: shieldAuthorizationConfig.trustedSigner,
+      bundler: bundlerConfig.bundler,
     };
 
     console.log('\nDEPLOY CONFIG:');

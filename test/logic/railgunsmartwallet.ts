@@ -5,7 +5,6 @@ import {
   setBalance,
   impersonateAccount,
 } from '@nomicfoundation/hardhat-network-helpers';
-import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { MerkleTree } from '../../helpers/logic/merkletree';
 import { Wallet } from '../../helpers/logic/wallet';
@@ -19,37 +18,8 @@ import {
   UnshieldType,
 } from '../../helpers/logic/transaction';
 import { arrayToHexString } from '../../helpers/global/bytes';
-import {
-  EMPTY_SHIELD_AUTHORIZATION_SCOPE,
-  getShieldAuthorizationScope,
-  signShieldAuthorizationForRequests,
-} from '../../helpers/logic/shieldAuthorization';
 
 describe('Logic/RailgunSmartWallet', () => {
-  async function getShieldAuthorization(
-    trustedSigner: SignerWithAddress,
-    railgunSmartWallet: {
-      address: string;
-      nonces(recipient: string): Promise<{ toBigInt(): bigint }>;
-    },
-    chainID: bigint,
-    shieldRequests: Awaited<ReturnType<Note['encryptForShield']>>[],
-  ): Promise<string> {
-    const scope = shieldRequests.length
-      ? getShieldAuthorizationScope(shieldRequests)
-      : EMPTY_SHIELD_AUTHORIZATION_SCOPE;
-    const nonce = (await railgunSmartWallet.nonces(scope)).toBigInt();
-
-    return signShieldAuthorizationForRequests(
-      trustedSigner,
-      railgunSmartWallet.address,
-      chainID,
-      shieldRequests,
-      nonce,
-      2n ** 32n,
-    );
-  }
-
   /**
    * Deploy fixtures
    *
@@ -98,7 +68,6 @@ describe('Logic/RailgunSmartWallet', () => {
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
-    await railgunSmartWalletAdmin.setTrustedSigner(adminAccount.address);
     await railgunSmartWalletAdmin.setBundler(await snarkBypassSigner.getAddress());
 
     // Deploy test ERC20 and approve for shield
@@ -165,15 +134,7 @@ describe('Logic/RailgunSmartWallet', () => {
     ];
 
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(
-      shieldRequests,
-      await getShieldAuthorization(
-        adminAccount,
-        railgunSmartWalletSnarkBypass,
-        chainID,
-        shieldRequests,
-      ),
-    );
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check lastEventBlock updated
     expect(await railgunSmartWalletSnarkBypass.lastEventBlock()).to.equal(
@@ -363,15 +324,7 @@ describe('Logic/RailgunSmartWallet', () => {
     );
 
     const shieldRequests = [await shieldNote.encryptForShield()];
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(
-      shieldRequests,
-      await getShieldAuthorization(
-        adminAccount,
-        railgunSmartWalletSnarkBypass,
-        chainID,
-        shieldRequests,
-      ),
-    );
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check token moved correctly
     expect(await testERC721.ownerOf(10)).to.equal(railgunSmartWalletSnarkBypass.address);
@@ -502,15 +455,7 @@ describe('Logic/RailgunSmartWallet', () => {
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
 
     await expect(
-      railgunSmartWalletSnarkBypass.shield(
-        shieldRequests,
-        await getShieldAuthorization(
-          adminAccount,
-          railgunSmartWalletSnarkBypass,
-          chainID,
-          shieldRequests,
-        ),
-      ),
+      railgunSmartWalletSnarkBypass.shield(shieldRequests),
     ).to.be.revertedWith('Invalid Note Value');
   });
 
@@ -541,15 +486,7 @@ describe('Logic/RailgunSmartWallet', () => {
     ];
 
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(
-      shieldRequests,
-      await getShieldAuthorization(
-        adminAccount,
-        railgunSmartWalletSnarkBypass,
-        chainID,
-        shieldRequests,
-      ),
-    );
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Scan transaction
     await merkletree.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
@@ -594,10 +531,7 @@ describe('Logic/RailgunSmartWallet', () => {
 
     // Transactions should succeed
     await expect(
-      railgunSmartWalletSnarkBypass.shield(
-        [],
-        await getShieldAuthorization(adminAccount, railgunSmartWalletSnarkBypass, chainID, []),
-      ),
+      railgunSmartWalletSnarkBypass.shield([]),
     ).to.eventually.be.fulfilled;
     await expect(railgunSmartWalletSnarkBypass.transact([])).to.eventually.be.fulfilled;
 
@@ -640,15 +574,7 @@ describe('Logic/RailgunSmartWallet', () => {
     );
 
     const shieldRequests = [await shieldNote.encryptForShield()];
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(
-      shieldRequests,
-      await getShieldAuthorization(
-        adminAccount,
-        railgunSmartWalletSnarkBypass,
-        chainID,
-        shieldRequests,
-      ),
-    );
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Scan transaction
     await merkletree.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
@@ -723,15 +649,7 @@ describe('Logic/RailgunSmartWallet', () => {
     ];
 
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(
-      shieldRequests,
-      await getShieldAuthorization(
-        adminAccount,
-        railgunSmartWalletSnarkBypass,
-        chainID,
-        shieldRequests,
-      ),
-    );
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check lastEventBlock updated
     expect(await railgunSmartWalletSnarkBypass.lastEventBlock()).to.equal(

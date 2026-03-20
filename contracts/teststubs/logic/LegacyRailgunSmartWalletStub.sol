@@ -17,11 +17,8 @@ import { RailgunLogic } from "../../logic/RailgunLogic.sol";
  * Legacy adapter test stub that preserves contract-callable transact behavior.
  */
 contract LegacyRailgunSmartWalletStub is RailgunLogic {
-  function shield(
-    ShieldRequest[] calldata _shieldRequests,
-    bytes calldata _authorization
-  ) external {
-    _requireShieldAuthorization(_getShieldAuthorizationScope(_shieldRequests), _authorization);
+  function shield(ShieldRequest[] calldata _shieldRequests) external {
+    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
 
     bytes32[] memory insertionLeaves = new bytes32[](_shieldRequests.length);
     CommitmentPreimage[] memory commitments = new CommitmentPreimage[](_shieldRequests.length);

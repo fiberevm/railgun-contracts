@@ -17,13 +17,9 @@ contract RailgunSmartWallet is RailgunLogic {
   /**
    * @notice Shields requested amount and token, creates a commitment hash from supplied values and adds to tree
    * @param _shieldRequests - list of commitments to shield
-   * @param _authorization - Encoded EIP-712 shield authorization.
    */
-  function shield(
-    ShieldRequest[] calldata _shieldRequests,
-    bytes calldata _authorization
-  ) external {
-    _requireShieldAuthorization(_getShieldAuthorizationScope(_shieldRequests), _authorization);
+  function shield(ShieldRequest[] calldata _shieldRequests) external {
+    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
 
     // Insertion and event arrays
     bytes32[] memory insertionLeaves = new bytes32[](_shieldRequests.length);
@@ -70,7 +66,7 @@ contract RailgunSmartWallet is RailgunLogic {
   /**
    * @notice Execute batch of Railgun snark transactions
    * @dev The proof does not bind the underlying note owner to msg.sender, so this
-   * entry point cannot safely enforce the caller whitelist as a user-authorization check.
+   * entry point cannot safely use the caller as a user-authorization signal.
    * @param _transactions - Transactions to execute
    */
   function transact(Transaction[] calldata _transactions) external onlyExternallyOwnedCaller {

@@ -5,16 +5,11 @@ import {
   setBalance,
   impersonateAccount,
 } from '@nomicfoundation/hardhat-network-helpers';
-import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import * as weth9artifact from '../../externalArtifacts/WETH9.json';
 
 import { getAdaptParams, transactWithAdaptParams } from '../../helpers/adapt/relay';
 import { loadArtifacts, listArtifacts } from '../../helpers/logic/artifacts';
-import {
-  getShieldAuthorizationScope,
-  signShieldAuthorizationForRequests,
-} from '../../helpers/logic/shieldAuthorization';
 import { dummyTransact, UnshieldType } from '../../helpers/logic/transaction';
 import { MerkleTree } from '../../helpers/logic/merkletree';
 import { Wallet } from '../../helpers/logic/wallet';
@@ -28,28 +23,6 @@ import {
 } from '../../helpers/global/bytes';
 
 describe('Adapt/Relay', () => {
-  async function getShieldAuthorization(
-    trustedSigner: SignerWithAddress,
-    railgunSmartWallet: {
-      address: string;
-      nonces(recipient: string): Promise<{ toBigInt(): bigint }>;
-    },
-    chainID: bigint,
-    shieldRequests: Awaited<ReturnType<Note['encryptForShield']>>[],
-  ): Promise<string> {
-    const scope = getShieldAuthorizationScope(shieldRequests);
-    const nonce = (await railgunSmartWallet.nonces(scope)).toBigInt();
-
-    return signShieldAuthorizationForRequests(
-      trustedSigner,
-      railgunSmartWallet.address,
-      chainID,
-      shieldRequests,
-      nonce,
-      2n ** 32n,
-    );
-  }
-
   /**
    * Deploy fixtures
    * @returns fixtures
@@ -74,13 +47,13 @@ describe('Adapt/Relay', () => {
     const poseidonT4 = await PoseidonT4.deploy();
 
     // Deploy RailgunSmartWallet
-    const RailgunLogic = await ethers.getContractFactory('LegacyRailgunSmartWalletStub', {
+    const RailgunSmartWallet = await ethers.getContractFactory('RailgunSmartWallet', {
       libraries: {
         PoseidonT3: poseidonT3.address,
         PoseidonT4: poseidonT4.address,
       },
     });
-    const railgunSmartWallet = await RailgunLogic.deploy();
+    const railgunSmartWallet = await RailgunSmartWallet.deploy();
 
     // Initialize RailgunSmartWallet
     await railgunSmartWallet.initializeRailgunLogic(
@@ -111,8 +84,8 @@ describe('Adapt/Relay', () => {
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
-    await railgunSmartWalletAdmin.setTrustedSigner(adminAccount.address);
     await railgunSmartWalletAdmin.setBundler(relayAdapt.address);
+    await railgunSmartWalletAdmin.setRelayAdapt(relayAdapt.address);
 
     // Deploy test ERC20 and approve for shield
     const TestERC20 = await ethers.getContractFactory('TestERC20');
@@ -285,10 +258,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    const shieldTransaction = await relayAdapt.shield(
-      [shieldRequest],
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
-    );
+    const shieldTransaction = await relayAdapt.shield([shieldRequest]);
 
     // Check tokens moved
     await expect(shieldTransaction).to.changeTokenBalances(
@@ -320,10 +290,7 @@ describe('Adapt/Relay', () => {
     const shieldRequestAll = await depositNoteAll.encryptForShield();
 
     // Shield
-    const shieldTransactionAll = await relayAdapt.shield(
-      [shieldRequestAll],
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequestAll]),
-    );
+    const shieldTransactionAll = await relayAdapt.shield([shieldRequestAll]);
 
     // Check tokens moved
     await expect(shieldTransactionAll).to.changeTokenBalances(
@@ -358,10 +325,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await relayAdapt.shield(
-      [shieldRequest, shieldRequest, shieldRequest],
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
-    );
+    await relayAdapt.shield([shieldRequest, shieldRequest, shieldRequest]);
 
     // No additions to the merkle tree should have been made
     expect(await railgunSmartWallet.nextLeafIndex()).to.equal(0);
@@ -388,10 +352,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest2 = await depositNote2.encryptForShield();
 
     // Shield
-    await relayAdapt.shield(
-      [shieldRequest, shieldRequest2],
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest2]),
-    );
+    await relayAdapt.shield([shieldRequest, shieldRequest2]);
 
     // Only non no-op tokens should be shielded
     await merkletree.insertLeaves([await depositNote2.getHash()], 0);
@@ -426,10 +387,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await relayAdapt.shield(
-      [shieldRequest],
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, [shieldRequest]),
-    );
+    await relayAdapt.shield([shieldRequest]);
 
     // Check tokens moved
     expect(await testERC721.ownerOf(10n)).to.equal(railgunSmartWallet.address);
@@ -456,7 +414,7 @@ describe('Adapt/Relay', () => {
     const shieldRequest = await depositNote.encryptForShield();
 
     // Shield
-    await expect(relayAdapt.shield([shieldRequest], '0x')).to.be.revertedWith(
+    await expect(relayAdapt.shield([shieldRequest])).to.be.revertedWith(
       'RelayAdapt: ERC1155 not yet supported',
     );
   });
@@ -782,10 +740,7 @@ describe('Adapt/Relay', () => {
     await testERC20Tokens[0].mint(relayAdapt.address, BigInt(shieldNotes.length) * 10n ** 18n);
 
     const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
-    const depositTX = await relayAdapt.shield(
-      shieldRequests,
-      await getShieldAuthorization(adminAccount, railgunSmartWallet, chainID, shieldRequests),
-    );
+    const depositTX = await relayAdapt.shield(shieldRequests);
 
     await merkletree.scanTX(depositTX, railgunSmartWallet);
     await wallet.scanTX(depositTX, railgunSmartWallet);

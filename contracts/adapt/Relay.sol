@@ -78,12 +78,8 @@ contract RelayAdapt {
   /**
    * @notice Executes a batch of Railgun shields
    * @param _shieldRequests - Tokens to shield
-   * @param _authorization - Encoded shield authorization for the recipient batch.
    */
-  function shield(
-    ShieldRequest[] calldata _shieldRequests,
-    bytes calldata _authorization
-  ) external onlySelfIfExecuting {
+  function shield(ShieldRequest[] calldata _shieldRequests) external onlySelfIfExecuting {
     // Loop through each token specified for shield and shield requested balance
 
     uint256 numValidTokens = 0;
@@ -161,7 +157,7 @@ contract RelayAdapt {
     }
 
     // Shield to railgun
-    railgun.shield(filteredShieldRequests, _authorization);
+    railgun.shield(filteredShieldRequests);
   }
 
   /**

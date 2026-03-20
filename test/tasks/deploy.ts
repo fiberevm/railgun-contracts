@@ -8,10 +8,6 @@ import {
 import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { VERIFICATION_BYPASS_ADDRESS } from '../../tasks/deploy/shared';
-import {
-  EMPTY_SHIELD_AUTHORIZATION_SCOPE,
-  signShieldAuthorization,
-} from '../../helpers/logic/shieldAuthorization';
 
 interface BaseDeployConfig {
   bundler: string;
@@ -23,7 +19,6 @@ interface BaseDeployConfig {
   proxyAdmin: string;
   treasuryImplementation: string;
   treasuryProxy: string;
-  trustedSigner: string;
   voting: string;
 }
 
@@ -77,7 +72,6 @@ async function deployNoGovernanceFixture() {
   const additionalUser = signers[1];
   const config = (await hre.run('deploy:no_governance', {
     bundler: additionalUser.address,
-    trustedsigner: deployer.address,
   })) as NoGovernanceDeployConfig;
   const railgun = await ethers.getContractAt('RailgunSmartWallet', config.proxy);
   const proxyAdmin = await ethers.getContractAt('ProxyAdmin', config.proxyAdmin);
@@ -101,7 +95,6 @@ async function deployFullFixture() {
     bundler: additionalUser.address,
     railName: 'RailTest',
     railSymbol: 'RAILTEST',
-    trustedsigner: deployer.address,
   })) as FullDeployConfig;
   const railgun = await ethers.getContractAt('RailgunSmartWallet', config.proxy);
   const proxyAdmin = await ethers.getContractAt('ProxyAdmin', config.proxyAdmin);
@@ -116,22 +109,6 @@ async function deployFullFixture() {
 }
 
 describe('Tasks/Deploy', () => {
-  async function emptyShieldAuthorization(
-    signer: SignerWithAddress,
-    verifyingContract: string,
-  ): Promise<string> {
-    const chainID = BigInt((await ethers.provider.send('eth_chainId', [])) as string);
-
-    return signShieldAuthorization(
-      signer,
-      verifyingContract,
-      chainID,
-      EMPTY_SHIELD_AUTHORIZATION_SCOPE,
-      0n,
-      2n ** 32n,
-    );
-  }
-
   it('configures bundler auth and omits RelayAdapt in deploy:test', async () => {
     const signers = await getTaskSigners();
     const deployer = signers[0];
@@ -141,50 +118,44 @@ describe('Tasks/Deploy', () => {
     await setBalance(VERIFICATION_BYPASS_ADDRESS, '0x56BC75E2D63100000');
     await impersonateAccount(VERIFICATION_BYPASS_ADDRESS);
     const verificationBypassSigner = await ethers.getSigner(VERIFICATION_BYPASS_ADDRESS);
-    const authorization = await emptyShieldAuthorization(deployer, railgun.address);
 
     expect(deployConfig).to.not.have.property('relayAdapt');
     expect(await railgun.bundler()).to.equal(deployConfig.bundler);
-    expect(await railgun.trustedSigner()).to.equal(deployConfig.trustedSigner);
 
-    await expect(railgun.connect(deployer).shield([], authorization)).to.not.be.reverted;
+    await expect(railgun.connect(deployer).shield([])).to.not.be.reverted;
     await expect(railgun.connect(verificationBypassSigner).transact([])).to.not.be.reverted;
     await expect(railgun.connect(otherUser).transact([])).to.not.be.reverted;
-    await expect(railgun.connect(otherUser).shield([], authorization))
+    await expect(railgun.connect(otherUser).shield([]))
       .to.be.revertedWithCustomError(railgun, 'InvalidBundler')
       .withArgs(otherUser.address);
   });
 
-  it('configures usable shield auth before transfer in deploy:no_governance', async () => {
+  it('configures a usable bundler before transfer in deploy:no_governance', async () => {
     const signers = await getTaskSigners();
     const deployer = signers[0];
     const additionalUser = signers[1];
 
     const { deployConfig, proxyAdmin, railgun } = await loadFixture(deployNoGovernanceFixture);
-    const authorization = await emptyShieldAuthorization(deployer, railgun.address);
 
     expect(deployConfig).to.not.have.property('relayAdapt');
     expect(await railgun.bundler()).to.equal(deployConfig.bundler);
-    expect(await railgun.trustedSigner()).to.equal(deployConfig.trustedSigner);
     expect(await proxyAdmin.owner()).to.equal(deployConfig.delegator);
 
-    await expect(railgun.connect(additionalUser).shield([], authorization)).to.not.be.reverted;
+    await expect(railgun.connect(additionalUser).shield([])).to.not.be.reverted;
   });
 
-  it('configures shield auth before governance handoff in deploy:full', async () => {
+  it('configures the bundler before governance handoff in deploy:full', async () => {
     const signers = await getTaskSigners();
     const deployer = signers[0];
     const additionalUser = signers[1];
 
     const { delegator, deployConfig, proxyAdmin, railgun } = await loadFixture(deployFullFixture);
-    const authorization = await emptyShieldAuthorization(deployer, railgun.address);
 
     expect(deployConfig).to.not.have.property('relayAdapt');
     expect(await railgun.bundler()).to.equal(deployConfig.bundler);
-    expect(await railgun.trustedSigner()).to.equal(deployConfig.trustedSigner);
     expect(await proxyAdmin.owner()).to.equal(deployConfig.delegator);
     expect(await delegator.owner()).to.equal(deployConfig.voting);
 
-    await expect(railgun.connect(additionalUser).shield([], authorization)).to.not.be.reverted;
+    await expect(railgun.connect(additionalUser).shield([])).to.not.be.reverted;
   });
 });

@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config';
 
 import { listArtifacts, loadArtifacts } from '../../helpers/logic/artifacts';
-import { configureShieldAuthorization, resolveShieldAuthorizationConfig } from './shared';
+import { configureBundler, resolveBundlerConfig } from './shared';
 import type { Contract } from 'ethers';
 
 /**
@@ -29,14 +29,11 @@ task(
   'Creates deployment without governance (eg. for use in rollup deployments)',
 )
   .addOptionalParam('bundler', 'Address allowed to call shield')
-  .addOptionalParam('trustedsigner', 'Address used to sign shield authorizations')
   .setAction(async function (
     {
       bundler,
-      trustedsigner,
     }: {
       bundler?: string;
-      trustedsigner?: string;
     },
     hre,
   ) {
@@ -112,16 +109,14 @@ task(
     console.log('\nSetting Artifacts');
     await loadArtifacts(railgun, listArtifacts());
 
-    const shieldAuthorizationConfig = resolveShieldAuthorizationConfig({
+    const bundlerConfig = resolveBundlerConfig({
       bundlerParam: bundler,
       defaultBundler: deployer.address,
-      defaultTrustedSigner: deployer.address,
       getAddress: ethers.utils.getAddress,
-      trustedSignerParam: trustedsigner,
     });
 
-    console.log('\nConfiguring shield authorization');
-    await configureShieldAuthorization(railgun, shieldAuthorizationConfig);
+    console.log('\nConfiguring bundler');
+    await configureBundler(railgun, bundlerConfig);
 
     // Transfer contract ownerships
     console.log('\nTransferring ownerships');
@@ -140,8 +135,7 @@ task(
       treasuryImplementation: treasuryImplementation.address,
       treasuryProxy: treasuryProxy.address,
       voting: '',
-      bundler: shieldAuthorizationConfig.bundler,
-      trustedSigner: shieldAuthorizationConfig.trustedSigner,
+      bundler: bundlerConfig.bundler,
     };
 
     console.log('\nDEPLOY CONFIG:');

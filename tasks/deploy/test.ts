@@ -3,10 +3,7 @@ import { task } from 'hardhat/config';
 import * as weth9artifact from '../../externalArtifacts/WETH9.json';
 
 import { loadArtifacts, listArtifacts } from '../../helpers/logic/artifacts';
-import {
-  configureShieldAuthorization,
-  resolveShieldAuthorizationConfig,
-} from './shared';
+import { configureBundler, resolveBundlerConfig } from './shared';
 import type { Contract } from 'ethers';
 
 /**
@@ -31,14 +28,11 @@ async function logVerify(
 
 task('deploy:test', 'Creates test environment deployment')
   .addOptionalParam('bundler', 'Address allowed to call shield')
-  .addOptionalParam('trustedsigner', 'Address used to sign shield authorizations')
   .setAction(async function (
     {
       bundler,
-      trustedsigner,
     }: {
       bundler?: string;
-      trustedsigner?: string;
     },
     hre,
   ) {
@@ -132,16 +126,14 @@ task('deploy:test', 'Creates test environment deployment')
     console.log('\nSetting Artifacts');
     await loadArtifacts(railgun, listArtifacts());
 
-    const shieldAuthorizationConfig = resolveShieldAuthorizationConfig({
+    const bundlerConfig = resolveBundlerConfig({
       bundlerParam: bundler,
       defaultBundler: deployer.address,
-      defaultTrustedSigner: deployer.address,
       getAddress: ethers.utils.getAddress,
-      trustedSignerParam: trustedsigner,
     });
 
-    console.log('\nConfiguring shield authorization');
-    await configureShieldAuthorization(railgun, shieldAuthorizationConfig);
+    console.log('\nConfiguring bundler');
+    await configureBundler(railgun, bundlerConfig);
 
     // Give deployer address full permissions
     console.log(`\nGiving full governance permissions to ${deployer.address}`);
@@ -185,8 +177,7 @@ task('deploy:test', 'Creates test environment deployment')
       treasuryProxy: treasuryProxy.address,
       voting: voting.address,
       weth9: weth9.address,
-      bundler: shieldAuthorizationConfig.bundler,
-      trustedSigner: shieldAuthorizationConfig.trustedSigner,
+      bundler: bundlerConfig.bundler,
     };
 
     console.log('\nDEPLOY CONFIG:');
