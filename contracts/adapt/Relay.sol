@@ -99,12 +99,15 @@ contract RelayAdapt {
           values[i] = _shieldRequests[i].preimage.value;
         }
 
-        // Approve the balance for shield
+        // Approve enough allowance for the entire batch. Multiple shield requests can target
+        // the same token, so per-request exact approvals would overwrite earlier allowance.
         // Set to 0 first for the following reasons:
         // https://github.com/Uniswap/interface/issues/1034
         // https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-        token.safeApprove(address(railgun), 0);
-        token.safeApprove(address(railgun), values[i]);
+        if (values[i] > 0 && token.allowance(address(this), address(railgun)) < values[i]) {
+          token.safeApprove(address(railgun), 0);
+          token.safeApprove(address(railgun), type(uint256).max);
+        }
 
         // Increment number of valid tokens if we have a balance to deposit
         if (values[i] > 0) {

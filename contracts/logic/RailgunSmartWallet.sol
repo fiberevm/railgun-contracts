@@ -19,6 +19,8 @@ contract RailgunSmartWallet is RailgunLogic {
    * @param _shieldRequests - list of commitments to shield
    */
   function shield(ShieldRequest[] calldata _shieldRequests) external {
+    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
+
     // Insertion and event arrays
     bytes32[] memory insertionLeaves = new bytes32[](_shieldRequests.length);
     CommitmentPreimage[] memory commitments = new CommitmentPreimage[](_shieldRequests.length);
@@ -31,7 +33,7 @@ contract RailgunSmartWallet is RailgunLogic {
       (bool valid, string memory reason) = RailgunLogic.validateCommitmentPreimage(
         _shieldRequests[notesIter].preimage
       );
-      require(valid, string.concat("RailgunSmartWallet: ", reason));
+      require(valid, reason);
 
       // Process shield request and store adjusted note
       (commitments[notesIter], fees[notesIter]) = RailgunLogic.transferTokenIn(
@@ -63,9 +65,11 @@ contract RailgunSmartWallet is RailgunLogic {
 
   /**
    * @notice Execute batch of Railgun snark transactions
+   * @dev The proof does not bind the underlying note owner to msg.sender, so this
+   * entry point cannot safely use the caller as a user-authorization signal.
    * @param _transactions - Transactions to execute
    */
-  function transact(Transaction[] calldata _transactions) external {
+  function transact(Transaction[] calldata _transactions) external onlyExternallyOwnedCaller {
     uint256 commitmentsCount = RailgunLogic.sumCommitments(_transactions);
 
     // Create accumulators
@@ -83,7 +87,7 @@ contract RailgunSmartWallet is RailgunLogic {
       (bool valid, string memory reason) = RailgunLogic.validateTransaction(
         _transactions[transactionIter]
       );
-      require(valid, string.concat("RailgunSmartWallet: ", reason));
+      require(valid, reason);
 
       // Nullify, accumulate, and update offset
       commitmentsStartOffset = RailgunLogic.accumulateAndNullifyTransaction(
@@ -106,7 +110,7 @@ contract RailgunSmartWallet is RailgunLogic {
         (bool valid, string memory reason) = RailgunLogic.validateCommitmentPreimage(
           _transactions[transactionIter].unshieldPreimage
         );
-        require(valid, string.concat("RailgunSmartWallet: ", reason));
+        require(valid, reason);
 
         RailgunLogic.transferTokenOut(_transactions[transactionIter].unshieldPreimage);
       }

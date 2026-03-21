@@ -5,7 +5,6 @@ pragma abicoder v2;
 // OpenZeppelin v4
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { StorageSlot } from "@openzeppelin/contracts/utils/StorageSlot.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -52,9 +51,16 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   // Last event block - to assist with scanning
   uint256 public lastEventBlock;
 
+  address public bundler;
+
+  error InvalidBundler(address account);
+  error ContractCallerNotAllowed(address account);
+
   // Treasury events
   event TreasuryChange(address treasury);
   event FeeChange(uint256 shieldFee, uint256 unshieldFee, uint256 nftFee);
+
+  event BundlerChanged(address indexed newBundler);
 
   // Transaction events
   event Transact(
@@ -360,9 +366,10 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
    */
   function checkSafetyVectors() external {
     // Set safety bit
-    StorageSlot
-      .getBooleanSlot(0x8dea8703c3cf94703383ce38a9c894669dccd4ca8e65ddb43267aa0248711450)
-      .value = true;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      sstore(0x8dea8703c3cf94703383ce38a9c894669dccd4ca8e65ddb43267aa0248711450, 1)
+    }
 
     // Setup behavior check
     bool result = false;
@@ -531,6 +538,23 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
 
     // Return new starting offset
     return _commitmentsStartOffset + _transaction.boundParams.commitmentCiphertext.length;
+  }
+
+  function setBundler(address _bundler) external onlyOwner {
+    if (bundler != _bundler) {
+      bundler = _bundler;
+      emit BundlerChanged(_bundler);
+    }
+  }
+
+  modifier onlyExternallyOwnedCaller() {
+    _requireExternallyOwnedCaller(msg.sender);
+    _;
+  }
+
+  function _requireExternallyOwnedCaller(address _account) internal view {
+    // solhint-disable-next-line avoid-tx-origin
+    if (_account != tx.origin) revert ContractCallerNotAllowed(_account);
   }
 
   uint256[43] private __gap;

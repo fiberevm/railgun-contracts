@@ -45,7 +45,7 @@ describe('Logic/RailgunSmartWallet', () => {
     const poseidonT4 = await PoseidonT4.deploy();
 
     // Deploy RailgunSmartWallet
-    const RailgunLogic = await ethers.getContractFactory('RailgunSmartWalletStub', {
+    const RailgunLogic = await ethers.getContractFactory('RailgunSmartWallet', {
       libraries: {
         PoseidonT3: poseidonT3.address,
         PoseidonT4: poseidonT4.address,
@@ -68,6 +68,7 @@ describe('Logic/RailgunSmartWallet', () => {
 
     // Load verification keys
     await loadArtifacts(railgunSmartWalletAdmin, listArtifacts());
+    await railgunSmartWalletAdmin.setBundler(await snarkBypassSigner.getAddress());
 
     // Deploy test ERC20 and approve for shield
     const TestERC20 = await ethers.getContractFactory('TestERC20');
@@ -100,8 +101,14 @@ describe('Logic/RailgunSmartWallet', () => {
   }
 
   it('Should shield, transfer, and withdraw ERC20', async () => {
-    const { chainID, treasuryAccount, secondaryAccount, railgunSmartWalletSnarkBypass, testERC20 } =
-      await loadFixture(deploy);
+    const {
+      adminAccount,
+      chainID,
+      treasuryAccount,
+      secondaryAccount,
+      railgunSmartWalletSnarkBypass,
+      testERC20,
+    } = await loadFixture(deploy);
 
     // Create merkle tree and wallets
     const merkletree = await MerkleTree.createTree();
@@ -126,9 +133,8 @@ describe('Logic/RailgunSmartWallet', () => {
       new Note(wallet1.spendingKey, wallet1.viewingKey, 10n ** 18n, randomBytes(16), tokenData, ''),
     ];
 
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield([
-      ...(await Promise.all(shieldNotes.map((note) => note.encryptForShield()))),
-    ]);
+    const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check lastEventBlock updated
     expect(await railgunSmartWalletSnarkBypass.lastEventBlock()).to.equal(
@@ -288,7 +294,7 @@ describe('Logic/RailgunSmartWallet', () => {
   });
 
   it('Should shield, transfer, and withdraw ERC721', async () => {
-    const { chainID, secondaryAccount, railgunSmartWalletSnarkBypass, testERC721 } =
+    const { adminAccount, chainID, secondaryAccount, railgunSmartWalletSnarkBypass, testERC721 } =
       await loadFixture(deploy);
 
     // Create merkle tree and wallets
@@ -317,9 +323,8 @@ describe('Logic/RailgunSmartWallet', () => {
       '',
     );
 
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield([
-      await shieldNote.encryptForShield(),
-    ]);
+    const shieldRequests = [await shieldNote.encryptForShield()];
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check token moved correctly
     expect(await testERC721.ownerOf(10)).to.equal(railgunSmartWalletSnarkBypass.address);
@@ -434,7 +439,8 @@ describe('Logic/RailgunSmartWallet', () => {
   });
 
   it('Should ensure note preimages are valid', async () => {
-    const { railgunSmartWallet, testERC20 } = await loadFixture(deploy);
+    const { adminAccount, chainID, railgunSmartWalletSnarkBypass, testERC20 } =
+      await loadFixture(deploy);
 
     // Shield notes
     const tokenData: TokenData = {
@@ -446,16 +452,16 @@ describe('Logic/RailgunSmartWallet', () => {
     const shieldNotes = [
       new Note(randomBytes(32), randomBytes(32), 0n, randomBytes(16), tokenData, ''),
     ];
+    const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
 
     await expect(
-      railgunSmartWallet.shield([
-        ...(await Promise.all(shieldNotes.map((note) => note.encryptForShield()))),
-      ]),
-    ).to.be.revertedWith('RailgunSmartWallet: Invalid Note Value');
+      railgunSmartWalletSnarkBypass.shield(shieldRequests),
+    ).to.be.revertedWith('Invalid Note Value');
   });
 
   it('Should reject invalid transactions', async () => {
-    const { chainID, railgunSmartWallet, testERC20 } = await loadFixture(deploy);
+    const { adminAccount, chainID, railgunSmartWallet, railgunSmartWalletSnarkBypass, testERC20 } =
+      await loadFixture(deploy);
 
     // Create merkle tree and wallets
     const merkletree = await MerkleTree.createTree();
@@ -479,14 +485,13 @@ describe('Logic/RailgunSmartWallet', () => {
       new Note(wallet1.spendingKey, wallet1.viewingKey, 10n ** 18n, randomBytes(16), tokenData, ''),
     ];
 
-    const shieldTransaction = await railgunSmartWallet.shield([
-      ...(await Promise.all(shieldNotes.map((note) => note.encryptForShield()))),
-    ]);
+    const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Scan transaction
-    await merkletree.scanTX(shieldTransaction, railgunSmartWallet);
-    await wallet1.scanTX(shieldTransaction, railgunSmartWallet);
-    await wallet2.scanTX(shieldTransaction, railgunSmartWallet);
+    await merkletree.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
+    await wallet1.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
+    await wallet2.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
 
     // Transfer tokens between shielded balances
     const transferNotes = padWithDummyNotes(
@@ -515,29 +520,33 @@ describe('Logic/RailgunSmartWallet', () => {
           transferNotes.outputs,
         ),
       ]),
-    ).to.be.revertedWith('RailgunSmartWallet: Invalid Snark Proof');
+    ).to.be.revertedWith('Invalid Snark Proof');
   });
 
   it('Should no-op on empty calls', async () => {
-    const { railgunSmartWallet } = await loadFixture(deploy);
+    const { adminAccount, chainID, railgunSmartWalletSnarkBypass } = await loadFixture(deploy);
 
     // Create merkle tree and wallets
     const merkletree = await MerkleTree.createTree();
 
     // Transactions should succeed
-    await expect(railgunSmartWallet.shield([])).to.eventually.be.fulfilled;
-    await expect(railgunSmartWallet.transact([])).to.eventually.be.fulfilled;
+    await expect(
+      railgunSmartWalletSnarkBypass.shield([]),
+    ).to.eventually.be.fulfilled;
+    await expect(railgunSmartWalletSnarkBypass.transact([])).to.eventually.be.fulfilled;
 
     // Merkle root shouldn't have changed
-    expect(await railgunSmartWallet.merkleRoot()).to.equal(arrayToHexString(merkletree.root, true));
+    expect(await railgunSmartWalletSnarkBypass.merkleRoot()).to.equal(
+      arrayToHexString(merkletree.root, true),
+    );
 
     // Tree number and next insertion index should still be 0
-    expect(await railgunSmartWallet.treeNumber()).to.equal(0);
-    expect(await railgunSmartWallet.nextLeafIndex()).to.equal(0);
+    expect(await railgunSmartWalletSnarkBypass.treeNumber()).to.equal(0);
+    expect(await railgunSmartWalletSnarkBypass.nextLeafIndex()).to.equal(0);
   });
 
   it("Shouln't transfer anything out if ERC721 unshield value = 0", async () => {
-    const { chainID, secondaryAccount, railgunSmartWalletSnarkBypass, testERC721 } =
+    const { adminAccount, chainID, secondaryAccount, railgunSmartWalletSnarkBypass, testERC721 } =
       await loadFixture(deploy);
 
     // Create merkle tree and wallets
@@ -564,9 +573,8 @@ describe('Logic/RailgunSmartWallet', () => {
       '',
     );
 
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield([
-      await shieldNote.encryptForShield(),
-    ]);
+    const shieldRequests = [await shieldNote.encryptForShield()];
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Scan transaction
     await merkletree.scanTX(shieldTransaction, railgunSmartWalletSnarkBypass);
@@ -604,14 +612,20 @@ describe('Logic/RailgunSmartWallet', () => {
     );
 
     await expect(railgunSmartWalletSnarkBypass.transact([unshieldtx])).to.be.revertedWith(
-      'RailgunSmartWallet: Invalid Note Value',
+      'Invalid Note Value',
     );
   });
 
   it("Shouln't transfer anything out if ERC20 unshield value = 0", async function () {
     this.timeout(5 * 60 * 60 * 1000);
-    const { chainID, treasuryAccount, secondaryAccount, railgunSmartWalletSnarkBypass, testERC20 } =
-      await loadFixture(deploy);
+    const {
+      adminAccount,
+      chainID,
+      treasuryAccount,
+      secondaryAccount,
+      railgunSmartWalletSnarkBypass,
+      testERC20,
+    } = await loadFixture(deploy);
 
     // Create merkle tree and wallets
     const merkletree = await MerkleTree.createTree();
@@ -634,9 +648,8 @@ describe('Logic/RailgunSmartWallet', () => {
       new Note(wallet.spendingKey, wallet.viewingKey, 10n ** 18n, randomBytes(16), tokenData, ''),
     ];
 
-    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield([
-      ...(await Promise.all(shieldNotes.map((note) => note.encryptForShield()))),
-    ]);
+    const shieldRequests = await Promise.all(shieldNotes.map((note) => note.encryptForShield()));
+    const shieldTransaction = await railgunSmartWalletSnarkBypass.shield(shieldRequests);
 
     // Check lastEventBlock updated
     expect(await railgunSmartWalletSnarkBypass.lastEventBlock()).to.equal(
@@ -697,7 +710,7 @@ describe('Logic/RailgunSmartWallet', () => {
     );
 
     await expect(railgunSmartWalletSnarkBypass.transact([unshieldtx])).to.be.revertedWith(
-      'RailgunSmartWallet: Invalid Note Value',
+      'Invalid Note Value',
     );
   });
 });
