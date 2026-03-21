@@ -1,7 +1,11 @@
 import { task } from 'hardhat/config';
 
 import { listArtifacts, loadArtifacts } from '../../helpers/logic/artifacts';
-import { configureBundler, resolveBundlerConfig } from './shared';
+import {
+  configureBundler,
+  patchProviderForContractCreation,
+  resolveBundlerConfig,
+} from './shared';
 import type { Contract } from 'ethers';
 
 /**
@@ -17,11 +21,12 @@ async function logVerify(
   constructorArguments: unknown[],
 ): Promise<null> {
   console.log(`\nDeploying ${name}`);
+  await contract.deployed();
   console.log({
     address: contract.address,
     constructorArguments,
   });
-  return contract.deployTransaction.wait().then();
+  return null;
 }
 
 task(
@@ -40,6 +45,7 @@ task(
     const { ethers } = hre;
     await hre.run('compile');
     const [deployer] = await ethers.getSigners();
+    patchProviderForContractCreation(ethers.provider);
 
     // Get build artifacts
     const Delegator = await ethers.getContractFactory('Delegator');
@@ -51,7 +57,9 @@ task(
 
     // Deploy Poseidon libraries
     const poseidonT3 = await PoseidonT3.deploy();
+    await logVerify('PoseidonT3', poseidonT3, []);
     const poseidonT4 = await PoseidonT4.deploy();
+    await logVerify('PoseidonT4', poseidonT4, []);
 
     // Get Railgun Smart Wallet
     const RailgunSmartWallet = await ethers.getContractFactory('RailgunSmartWallet', {
