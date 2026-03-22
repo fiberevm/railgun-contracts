@@ -1,0 +1,16 @@
+{
+  "network": "mainnet",
+  "chainId": 1,
+  "deployer": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29",
+  "contracts": {
+    "poseidonT3": "0x9C5c6c8316f5e6671e1dB7672993453F4eB63C91",
+    "poseidonT4": "0x539b3A61cFe632B72d7053310aa980823b571149",
+    "delegator": "0xd2b485ae13B46cDEF62c100aE8430Ad63976D0E2",
+    "treasuryImplementation": "0x90f906A748947A8055c8148448eeD7dC099e74d4",
+    "proxyAdmin": "0x3eb5b3409bb444440aFcF1b215d520F5be980a77",
+    "treasuryProxy": "0x0f26eA027199C3fdCc195da6930D1DDd187d9E15",
+    "proxy": "0xc835F7252338E1A7a533927C64fC148D6A940C5F",
+    "implementation": "0xc6372734976D83B3CACf1c6Bb67a5791C502aE74",
+    "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
+  }
+}
