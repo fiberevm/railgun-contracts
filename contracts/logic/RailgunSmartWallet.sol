@@ -69,7 +69,10 @@ contract RailgunSmartWallet is RailgunLogic {
    * entry point cannot safely use the caller as a user-authorization signal.
    * @param _transactions - Transactions to execute
    */
-  function transact(Transaction[] calldata _transactions) external onlyExternallyOwnedCaller {
+  function transact(Transaction[] calldata _transactions) external {
+    // Restrict to the authorized relayer — same auth as shield().
+    // Replaces the former EOA-only gate to support 7702-delegated execution.
+    if (msg.sender != bundler) revert InvalidBundler(msg.sender);
     uint256 commitmentsCount = RailgunLogic.sumCommitments(_transactions);
 
     // Create accumulators
