@@ -32,6 +32,20 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
       chainId: 11155111,
     },
+    base: {
+      url:
+        process.env.BASE_RPC_URL ??
+        `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      chainId: 8453,
+    },
+    baseSepolia: {
+      url:
+        process.env.BASE_SEPOLIA_RPC_URL ??
+        `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      chainId: 84532,
+    },
   },
   solidity: {
     compilers: [
@@ -70,7 +84,30 @@ const config: HardhatUserConfig = {
     currency: 'USD',
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY ?? '',
+      sepolia: process.env.ETHERSCAN_API_KEY ?? '',
+      base: process.env.BASESCAN_API_KEY ?? '',
+      baseSepolia: process.env.BASESCAN_API_KEY ?? '',
+    },
+    customChains: [
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org',
+        },
+      },
+    ],
   },
 };
 

@@ -1,4 +1,6 @@
 import { task } from 'hardhat/config';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { listArtifacts, loadArtifacts } from '../../helpers/logic/artifacts';
 import {
@@ -148,5 +150,33 @@ task(
 
     console.log('\nDEPLOY CONFIG:');
     console.log(deployConfig);
+
+    const networkName = hre.network.name;
+    if (networkName !== 'hardhat' && networkName !== 'localhost') {
+      const chainId = hre.network.config.chainId;
+      const artifact = {
+        network: networkName,
+        chainId,
+        deployer: deployer.address,
+        contracts: {
+          poseidonT3: poseidonT3.address,
+          poseidonT4: poseidonT4.address,
+          delegator: delegator.address,
+          treasuryImplementation: treasuryImplementation.address,
+          proxyAdmin: proxyAdmin.address,
+          treasuryProxy: treasuryProxy.address,
+          proxy: proxy.address,
+          implementation: implementation.address,
+          bundler: bundlerConfig.bundler,
+        },
+      };
+
+      const outDir = path.join(__dirname, '..', '..', 'deployments');
+      fs.mkdirSync(outDir, { recursive: true });
+      const outPath = path.join(outDir, `${networkName}.json`);
+      fs.writeFileSync(outPath, `${JSON.stringify(artifact, null, 2)}\n`);
+      console.log(`\nWrote deployment artifact to ${outPath}`);
+    }
+
     return deployConfig;
   });
