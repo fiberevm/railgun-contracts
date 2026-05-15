@@ -69,7 +69,7 @@ contract RailgunSmartWallet is RailgunLogic {
    * entry point cannot safely use the caller as a user-authorization signal.
    * @param _transactions - Transactions to execute
    */
-  function transact(Transaction[] calldata _transactions) external onlyExternallyOwnedCaller {
+  function transact(Transaction[] calldata _transactions) external {
     uint256 commitmentsCount = RailgunLogic.sumCommitments(_transactions);
 
     // Create accumulators

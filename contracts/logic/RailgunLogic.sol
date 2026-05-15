@@ -54,7 +54,6 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
   address public bundler;
 
   error InvalidBundler(address account);
-  error ContractCallerNotAllowed(address account);
 
   // Treasury events
   event TreasuryChange(address treasury);
@@ -545,16 +544,6 @@ contract RailgunLogic is Initializable, OwnableUpgradeable, Commitments, TokenBl
       bundler = _bundler;
       emit BundlerChanged(_bundler);
     }
-  }
-
-  modifier onlyExternallyOwnedCaller() {
-    _requireExternallyOwnedCaller(msg.sender);
-    _;
-  }
-
-  function _requireExternallyOwnedCaller(address _account) internal view {
-    // solhint-disable-next-line avoid-tx-origin
-    if (_account != tx.origin) revert ContractCallerNotAllowed(_account);
   }
 
   uint256[43] private __gap;

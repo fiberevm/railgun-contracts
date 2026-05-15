@@ -530,15 +530,9 @@ describe('Adapt/Relay', () => {
     ).to.be.revertedWithCustomError(relayAdapt, 'CallFailed');
   });
 
-  it('Should reject relay bundle submission because transact is EOA-only', async () => {
-    const {
-      chainID,
-      primaryAccount,
-      relayAdapt,
-      relayAdaptSnarkBypass,
-      railgunSmartWallet,
-      testERC20Tokens,
-    } = await loadFixture(deploy);
+  it('Should allow relay bundle submission through RelayAdapt', async () => {
+    const { chainID, primaryAccount, relayAdapt, railgunSmartWallet, testERC20Tokens } =
+      await loadFixture(deploy);
 
     // Deploy multicall target
     const GovernanceStateChangeTargetStub = await ethers.getContractFactory(
@@ -637,45 +631,8 @@ describe('Adapt/Relay', () => {
       relayAdapt.relay(transactionsWrongAdaptID, actionData, { gasLimit: 11000000n }),
     ).to.be.revertedWith('RelayAdapt: AdaptID Parameters Mismatch');
 
-    await expect(relayAdapt.relay(transactions, actionData, { gasLimit: 11000000n }))
-      .to.be.revertedWithCustomError(railgunSmartWallet, 'ContractCallerNotAllowed')
-      .withArgs(relayAdapt.address);
-    expect(await governanceStateChangeTargetStub.greeting()).to.equal('hello');
-
-    // Verification bypass address shouldn't revert
-    // Generate transaction bundle and actions
-    const notesInOutSnarkBypass = await wallet.getTestTransactionInputs(
-      merkletree,
-      2,
-      3,
-      false,
-      tokenData,
-      wallet.spendingKey,
-      wallet.viewingKey,
-    );
-
-    const actionDataNoOp = {
-      random: randomBytes(31),
-      requireSuccess: false,
-      minGasLimit: 0n,
-      calls: [],
-    };
-
-    const transactionsSnarkBypass = [
-      await dummyTransact(
-        merkletree,
-        0n,
-        UnshieldType.NONE,
-        chainID,
-        relayAdapt.address,
-        new Uint8Array(32),
-        notesInOutSnarkBypass.inputs,
-        notesInOutSnarkBypass.outputs,
-      ),
-    ];
-
-    await expect(relayAdaptSnarkBypass.relay(transactionsSnarkBypass, actionDataNoOp))
-      .to.be.revertedWithCustomError(railgunSmartWallet, 'ContractCallerNotAllowed')
-      .withArgs(relayAdapt.address);
+    await expect(relayAdapt.relay(transactions, actionData, { gasLimit: 11000000n })).to.not.be
+      .reverted;
+    expect(await governanceStateChangeTargetStub.greeting()).to.equal('hi');
   });
 });
