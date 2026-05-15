@@ -133,7 +133,7 @@ describe('Logic/BundlerShield', () => {
     );
   });
 
-  it('Should allow EOAs to transact and block arbitrary contracts', async () => {
+  it('Should allow EOAs and contracts to transact', async () => {
     const { railgun, snarkBypassSigner, user1 } = await loadFixture(deploy);
 
     await expect(railgun.connect(user1).transact([])).to.not.be.reverted;
@@ -148,8 +148,6 @@ describe('Logic/BundlerShield', () => {
       calls: [],
     };
 
-    await expect(relayAdapt.relay([], actionData))
-      .to.be.revertedWithCustomError(railgun, 'ContractCallerNotAllowed')
-      .withArgs(relayAdapt.address);
+    await expect(relayAdapt.relay([], actionData)).to.not.be.reverted;
   });
 });
