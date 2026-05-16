@@ -14,6 +14,10 @@ import mocharc from './.mocharc.json';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+const privateKey =
+  process.env.PRIVATE_KEY ?? process.env.OWNER_PRIVATE_KEY ?? process.env.owner_private_key;
+const accounts = privateKey ? [`0x${privateKey.replace(/^0x/, '')}`] : [];
+
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
@@ -22,28 +26,28 @@ const config: HardhatUserConfig = {
         process.env.ETH_RPC_URL ??
         process.env.RPC_URL ??
         `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      accounts,
       chainId: 1,
     },
     sepolia: {
       url:
         process.env.SEPOLIA_RPC_URL ??
         `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      accounts,
       chainId: 11155111,
     },
     base: {
       url:
         process.env.BASE_RPC_URL ??
         `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      accounts,
       chainId: 8453,
     },
     baseSepolia: {
       url:
         process.env.BASE_SEPOLIA_RPC_URL ??
         `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY ?? ''}`,
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY.replace(/^0x/, '')}`] : [],
+      accounts,
       chainId: 84532,
     },
   },
