@@ -10,7 +10,7 @@
     "proxyAdmin": "0x3eb5b3409bb444440aFcF1b215d520F5be980a77",
     "treasuryProxy": "0x0f26eA027199C3fdCc195da6930D1DDd187d9E15",
     "proxy": "0xc835F7252338E1A7a533927C64fC148D6A940C5F",
-    "implementation": "0xc6372734976D83B3CACf1c6Bb67a5791C502aE74",
+    "implementation": "0x51a87cCb1e1Cc35013CEb967953edf94815ce923",
     "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
   }
 }
