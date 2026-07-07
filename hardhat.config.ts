@@ -50,6 +50,11 @@ const config: HardhatUserConfig = {
       accounts,
       chainId: 84532,
     },
+    bnb: {
+      url: process.env.BNB_RPC_URL ?? process.env.RPC_URL ?? 'https://bsc-dataseed.binance.org/',
+      accounts,
+      chainId: 56,
+    },
   },
   solidity: {
     compilers: [
@@ -93,6 +98,7 @@ const config: HardhatUserConfig = {
       sepolia: process.env.ETHERSCAN_API_KEY ?? '',
       base: process.env.BASESCAN_API_KEY ?? '',
       baseSepolia: process.env.BASESCAN_API_KEY ?? '',
+      bnb: process.env.BSCSCAN_API_KEY ?? '',
     },
     customChains: [
       {
@@ -109,6 +115,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-sepolia.basescan.org/api',
           browserURL: 'https://sepolia.basescan.org',
+        },
+      },
+      {
+        network: 'bnb',
+        chainId: 56,
+        urls: {
+          apiURL: 'https://api.bscscan.com/api',
+          browserURL: 'https://bscscan.com',
         },
       },
     ],
