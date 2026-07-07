@@ -1,0 +1,16 @@
+{
+  "network": "bnb",
+  "chainId": 56,
+  "deployer": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29",
+  "contracts": {
+    "poseidonT3": "0x46fB2e8D9Cd5690b19769E0865f75847db9D66b3",
+    "poseidonT4": "0x29312F94f6eb6283A8406C111f3a01c3f623123D",
+    "delegator": "0x22F45899EE13042ae046f7Aa7C2292Ea74C7F1c6",
+    "treasuryImplementation": "0x90f911069d136F1748558391A52E4362442a0D5e",
+    "proxyAdmin": "0x487053b6C2031f1E4aAFef1DC9E51e69da4b094F",
+    "treasuryProxy": "0xe74c5B60E522f763297E48e105f61D91bbd5D970",
+    "proxy": "0x25BFD6387B5196d7911d2C82148c6f817E1d97fE",
+    "implementation": "0x9EB2Fcb09B14C58D7Ce23Ea152b77b7286A00811",
+    "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
+  }
+}
