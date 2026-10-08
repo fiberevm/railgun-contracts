@@ -1,0 +1,897 @@
+{
+  "network": "arbitrum",
+  "chainId": 42161,
+  "deployer": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
+  "contracts": {
+    "poseidonT3": "0x956b2e366b9d0f265DA27eEfBc87572Eec71d6DE",
+    "poseidonT4": "0xED978DA53695CEd117B91598fdc613607Ea6bFfE",
+    "delegator": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "treasuryImplementation": "0x58b4a4604e8c142D47c2696a6ad75692C71d8F99",
+    "proxyAdmin": "0xDAA9EA0D72d03E7F0457945e0D1b6bb2541CeF42",
+    "treasuryProxy": "0x2CD346d310d33074f946B82b9C216c4D79053C9a",
+    "proxy": "0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092",
+    "implementation": "0xf1239bE1C543975c30509E667dB21527A2A0053E",
+    "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
+  },
+  "runtimeHashes": {
+    "poseidonT3": "0x354b26999e434f8256d168395315e1f51fc15bf49bf2e6bb58fc549bd597e7da",
+    "poseidonT4": "0xe247ac4f3d40602f0ac0604b0f1fe631237cbc64d3e29a5d5e45721f2d94fa81",
+    "delegator": "0x35c5c85afef74bf24e12f6f7180bb40e9598be50144f0a488278e181bb16a30e",
+    "treasuryImplementation": "0xa702b6789e395e7fbd6cd1c975411b2a0a910e111a9e1892b271b345fc062844",
+    "proxyAdmin": "0x0bc9abe32fd0d78623958ff7b21525fba9f1baae95c48bade648976070573b98",
+    "treasuryProxy": "0xe9bcdc3bea3cda0b9e8e9337899c43175a19aac915d12bde6fa519df72cb95a9",
+    "proxy": "0xe9bcdc3bea3cda0b9e8e9337899c43175a19aac915d12bde6fa519df72cb95a9",
+    "implementation": "0x8dc7e290b42d75408302cc882a14ee55416e2fe0731b92c480f6120b9946a2d5"
+  },
+  "gasUsed": "110377547",
+  "totalCostETH": "0.002210406405391547",
+  "startingBalanceETH": "0.005",
+  "remainingBalanceETH": "0.002789593594608453",
+  "verifiedCircuitKeys": 91,
+  "transactions": [
+    {
+      "hash": "0xcb1760c8b81ec96d169dae6298acaee0b63e4db4bdc4e2a8671979c3bda7a28d",
+      "blockNumber": 512998823,
+      "gasUsed": "2189673",
+      "effectiveGasPrice": "20000001",
+      "costWei": "43793462189673",
+      "contractAddress": "0x956b2e366b9d0f265DA27eEfBc87572Eec71d6DE"
+    },
+    {
+      "hash": "0x21f998994e72b37fbfaa95179daddf97412232eaddf3f69988ffd1f2770a61b9",
+      "blockNumber": 512998845,
+      "gasUsed": "2787971",
+      "effectiveGasPrice": "20118001",
+      "costWei": "56088403365971",
+      "contractAddress": "0xED978DA53695CEd117B91598fdc613607Ea6bFfE"
+    },
+    {
+      "hash": "0x2f7b36ac1f35114eb7d575a15d10425dd9b58a694deced227ca401622ec09217",
+      "blockNumber": 512998862,
+      "gasUsed": "643024",
+      "effectiveGasPrice": "20036001",
+      "costWei": "12883629507024",
+      "contractAddress": "0x51145142FDCf5d52C562F0EcE21521099267A15D"
+    },
+    {
+      "hash": "0xf0e5bef448af24afcc4368dc7233268554b46f3a0a701675d4d9587b6d695921",
+      "blockNumber": 512998882,
+      "gasUsed": "905247",
+      "effectiveGasPrice": "20104001",
+      "costWei": "18199086593247",
+      "contractAddress": "0x58b4a4604e8c142D47c2696a6ad75692C71d8F99"
+    },
+    {
+      "hash": "0x8aec39a45e84737fa083cfd27c15921deb75e9c1dde9b3275de0928a5836bb2b",
+      "blockNumber": 512998904,
+      "gasUsed": "321116",
+      "effectiveGasPrice": "20000001",
+      "costWei": "6422320321116",
+      "contractAddress": "0xDAA9EA0D72d03E7F0457945e0D1b6bb2541CeF42"
+    },
+    {
+      "hash": "0x60b05e34065bd490489c1550a426239cf1987cc35af06d8b10a415682361f956",
+      "blockNumber": 512998922,
+      "gasUsed": "434360",
+      "effectiveGasPrice": "20026001",
+      "costWei": "8698493794360",
+      "contractAddress": "0x2CD346d310d33074f946B82b9C216c4D79053C9a"
+    },
+    {
+      "hash": "0xe946efff230963f45ea3b16f7601e4013a83392f86b814cc9b6108b628f13910",
+      "blockNumber": 512998944,
+      "gasUsed": "434366",
+      "effectiveGasPrice": "20004001",
+      "costWei": "8689057898366",
+      "contractAddress": "0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092"
+    },
+    {
+      "hash": "0x82e80d9c7db3acf61be757e378b29a7f3f75c215370503721a44d366a9cf8642",
+      "blockNumber": 512998962,
+      "gasUsed": "5072867",
+      "effectiveGasPrice": "20000001",
+      "costWei": "101457345072867",
+      "contractAddress": "0xf1239bE1C543975c30509E667dB21527A2A0053E"
+    },
+    {
+      "hash": "0x466d19dfc6d4740c4e84845e76748f0c87ffdb30e016993a5e1812b9ed832b78",
+      "blockNumber": 512998984,
+      "gasUsed": "54457",
+      "effectiveGasPrice": "20010001",
+      "costWei": "1089684624457",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x825e4e69e5742bbc79cea0057d09725fc5e3d45f7d440b0adaa8dd6bb5849453",
+      "blockNumber": 512999003,
+      "gasUsed": "31026",
+      "effectiveGasPrice": "20000001",
+      "costWei": "620520031026",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x90f58e570a8975999455eece0e82e7f6e45d5639f23b6eaf9671615d9ab02c93",
+      "blockNumber": 512999016,
+      "gasUsed": "54456",
+      "effectiveGasPrice": "20022001",
+      "costWei": "1090318086456",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x320850760f3c2f6607fca9cf99b689616be5dc15b14444c0bf753e16cd85fa57",
+      "blockNumber": 512999035,
+      "gasUsed": "31025",
+      "effectiveGasPrice": "20050001",
+      "costWei": "622051281025",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x024beaa9b7e671dc2ebdbea3747e2d48b7282c31774f513f74f6ba4f0abb8f0c",
+      "blockNumber": 512999055,
+      "gasUsed": "103101",
+      "effectiveGasPrice": "20000001",
+      "costWei": "2062020103101",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xa88fc2c5015a26e9801746305721dd76c12f6ef58f405617936c05b26b7ab124",
+      "blockNumber": 512999074,
+      "gasUsed": "1433026",
+      "effectiveGasPrice": "20024001",
+      "costWei": "28694914057026",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3f9109d686804f33f214c7150de43624407c60f1a380e64d40bdc10b6b435a6a",
+      "blockNumber": 512999094,
+      "gasUsed": "683003",
+      "effectiveGasPrice": "20000001",
+      "costWei": "13660060683003",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xd72bb47d3dbd8b5e41d4e9facda00a3dc8018ffcb0eff7a66579c2e36cb74f1e",
+      "blockNumber": 512999116,
+      "gasUsed": "729272",
+      "effectiveGasPrice": "20000001",
+      "costWei": "14585440729272",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x8dcec309f1cce683b6efbc3fc0333ef532f98b49b616da0a49fd8df793e79f04",
+      "blockNumber": 512999135,
+      "gasUsed": "775433",
+      "effectiveGasPrice": "20046001",
+      "costWei": "15544330693433",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x85a0698f0244ed0fd40c8c1a69d47266371c624e5f7bcf96715559b595f0a7e6",
+      "blockNumber": 512999157,
+      "gasUsed": "821771",
+      "effectiveGasPrice": "20030001",
+      "costWei": "16460073951771",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x72c58c2872fa910ac5afb573e94434f623d7e514e6b30e3649c5f99cde441000",
+      "blockNumber": 512999178,
+      "gasUsed": "868110",
+      "effectiveGasPrice": "20006001",
+      "costWei": "17367409528110",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x536943bde25fea86e7913a60203411308b79831c71d1a7cf3aded0f61908c86e",
+      "blockNumber": 512999195,
+      "gasUsed": "914328",
+      "effectiveGasPrice": "20000001",
+      "costWei": "18286560914328",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xc31572b878af0bdcbd18da0c00b774c40ddfc5b4804d86ff14b257d01bc025dc",
+      "blockNumber": 512999218,
+      "gasUsed": "960477",
+      "effectiveGasPrice": "20000001",
+      "costWei": "19209540960477",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x1e09967ad6ebc98fce9f37ac80368e39b2d7b5bb1d91ea7deaeec79ddb40b85d",
+      "blockNumber": 512999235,
+      "gasUsed": "1006722",
+      "effectiveGasPrice": "20044001",
+      "costWei": "20178736774722",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x1fb6ba9b4704dfde51624b4e82c83e1a2dcdefac6f0f8de3590a0076265fad07",
+      "blockNumber": 512999252,
+      "gasUsed": "1053027",
+      "effectiveGasPrice": "20016001",
+      "costWei": "21077389485027",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x27046aba9a1b39ddf8825794c31265de431c60ed6fa30c224272fe7485a4bd19",
+      "blockNumber": 512999268,
+      "gasUsed": "1099321",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21986421099321",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x062b04b8b0a249b55adcd1d3f652f221d34328b3b62d35d7404bc914999b58b2",
+      "blockNumber": 512999288,
+      "gasUsed": "1145564",
+      "effectiveGasPrice": "20064001",
+      "costWei": "22984597241564",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x9916db347ac5d7a3641b60d22c6ad4b7e4446e52415158b037c7102609463dfd",
+      "blockNumber": 512999307,
+      "gasUsed": "1191810",
+      "effectiveGasPrice": "20000001",
+      "costWei": "23836201191810",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x51e1f4655e1109ef8feb46dac20e583677168418cb61a6f4f1fde9af3d0377ea",
+      "blockNumber": 512999323,
+      "gasUsed": "1237995",
+      "effectiveGasPrice": "20022001",
+      "costWei": "24787137127995",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x6df275488704aec3d025ca9769486ba09244a4a89a6ee304515419ef237b58d8",
+      "blockNumber": 512999343,
+      "gasUsed": "729298",
+      "effectiveGasPrice": "20006001",
+      "costWei": "14590336517298",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x69cc6b8b824259b4b94651cb0efc794742366d052ee38f8b032683787f060de1",
+      "blockNumber": 512999364,
+      "gasUsed": "775469",
+      "effectiveGasPrice": "20000001",
+      "costWei": "15509380775469",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xa16c6148eeb296b14aa824806376b3739e3af54c8813f2f970683585de4ab94a",
+      "blockNumber": 512999384,
+      "gasUsed": "821777",
+      "effectiveGasPrice": "20036001",
+      "costWei": "16465124793777",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x6ef818e41fa73439593e28bdc71a59ee5a5b0199663f3fc5872765c33a832c22",
+      "blockNumber": 512999404,
+      "gasUsed": "868063",
+      "effectiveGasPrice": "20004001",
+      "costWei": "17364733120063",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3718c049c69bf1d29652820e669e6212afb41f1b284691434a839ee49b55f600",
+      "blockNumber": 512999424,
+      "gasUsed": "914275",
+      "effectiveGasPrice": "20000001",
+      "costWei": "18285500914275",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x8e44c1fc168e48cec495a76ac45547d6c2dee15afd254bec540c777e3745d885",
+      "blockNumber": 512999444,
+      "gasUsed": "960547",
+      "effectiveGasPrice": "20000001",
+      "costWei": "19210940960547",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5c14d58f33c984ba1ad855e2d95908711cc5ae4d0f09977fdaf27b38017e8ce9",
+      "blockNumber": 512999464,
+      "gasUsed": "1006722",
+      "effectiveGasPrice": "20032001",
+      "costWei": "20166656110722",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xa9ae565b9aca92eeb89e2922d49fc0dcd72f76d22c44ab709b11bb451de2585a",
+      "blockNumber": 512999486,
+      "gasUsed": "1053025",
+      "effectiveGasPrice": "20046001",
+      "costWei": "21108940203025",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0c2c05e0cf5136d6ea5e4e2cf82a02669463025d43b5c06c2b9f6d7e74b2f444",
+      "blockNumber": 512999508,
+      "gasUsed": "1099316",
+      "effectiveGasPrice": "20024001",
+      "costWei": "22012704683316",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x7b4d433afcd460819e7313c0b100718fda02392a3906eb955733d95d7f06a39b",
+      "blockNumber": 512999529,
+      "gasUsed": "1145536",
+      "effectiveGasPrice": "20000001",
+      "costWei": "22910721145536",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x4c970b2e394a9b5cc5ed52d939d07fc383bce24ea7095165f006f6ca21437da4",
+      "blockNumber": 512999549,
+      "gasUsed": "1191732",
+      "effectiveGasPrice": "20020001",
+      "costWei": "23858475831732",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xd95dc45122c0bf62ab309e994173c3209e7705efdea9b94d631f510eb835f81a",
+      "blockNumber": 512999569,
+      "gasUsed": "1237981",
+      "effectiveGasPrice": "20006001",
+      "costWei": "24767049123981",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x67ce68a5ad7c065fd86e003b1b311d6b8313a4fa1a2621e34e396a7a999767b7",
+      "blockNumber": 512999591,
+      "gasUsed": "775523",
+      "effectiveGasPrice": "20000001",
+      "costWei": "15510460775523",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x7385a3b5b6ea66cefb34c3e1e51d1009eabed9180951f164add8a16f5823da78",
+      "blockNumber": 512999612,
+      "gasUsed": "821795",
+      "effectiveGasPrice": "20030001",
+      "costWei": "16460554671795",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x236247f438f47e3ae210ce946135a119a9e5754cb7423fdaa4c9ba9fb885894c",
+      "blockNumber": 512999634,
+      "gasUsed": "868073",
+      "effectiveGasPrice": "20000001",
+      "costWei": "17361460868073",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xb15d107b9d9c6363929c1132f86cefeb7c573bb242c0867c77173b35f1af500f",
+      "blockNumber": 512999658,
+      "gasUsed": "913387",
+      "effectiveGasPrice": "20000001",
+      "costWei": "18267740913387",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x1845be34f5ebaf90f7d0e06eda52b8cb7b33f849ac9d7d10e56e4cd8cba0ce48",
+      "blockNumber": 512999676,
+      "gasUsed": "959571",
+      "effectiveGasPrice": "20004001",
+      "costWei": "19195259243571",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xf33730d6cb0473ea0777212ef4a0d95632002affdb57a30133035083fbd794b6",
+      "blockNumber": 512999697,
+      "gasUsed": "1005782",
+      "effectiveGasPrice": "20002001",
+      "costWei": "20117652569782",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xe2d06b2e468179a1b707af906fab79a63a7ff399ffb4bd6be58e297966d43cce",
+      "blockNumber": 512999719,
+      "gasUsed": "1052023",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21040461052023",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5f57cd2eac3d336259dadde2b7e745bc564463bd9e728014dd88f599cca9ad11",
+      "blockNumber": 512999740,
+      "gasUsed": "1098222",
+      "effectiveGasPrice": "20134001",
+      "costWei": "22111602846222",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x4d90a183754e4948004a54b3597876b214b6d408fc07270c401a66df2fb37809",
+      "blockNumber": 512999761,
+      "gasUsed": "1144418",
+      "effectiveGasPrice": "20002001",
+      "costWei": "22890649980418",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x44c08b9103797aa4f37006d207b8dba91626d9c25dee8fe58c182f17cb35b766",
+      "blockNumber": 512999782,
+      "gasUsed": "1190609",
+      "effectiveGasPrice": "20020001",
+      "costWei": "23835993370609",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x369c10a596da5373b79cfd997683bb0e3255823636453462e40988e4ad8e734d",
+      "blockNumber": 512999804,
+      "gasUsed": "1236821",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24736421236821",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x2d55432057ab42700212e0f8a550d1fa88a0d24f62a4b9c9e2538520ecc646a4",
+      "blockNumber": 512999826,
+      "gasUsed": "820993",
+      "effectiveGasPrice": "20032001",
+      "costWei": "16446132596993",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x1268d96e11c0d20f095893566a4cfcd82350a85a0a3131632b999652cbd06dfb",
+      "blockNumber": 512999847,
+      "gasUsed": "867198",
+      "effectiveGasPrice": "20012001",
+      "costWei": "17354367243198",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3a3495cd97fd56a968cee3e5e09e13fef734fe44e415de5c849e1486f15105bb",
+      "blockNumber": 512999866,
+      "gasUsed": "913428",
+      "effectiveGasPrice": "20002001",
+      "costWei": "18270387769428",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x7393694ec6fce22ae6b0864c70d7a74fb02c5d6f6f125cbb4caf8447e22720c6",
+      "blockNumber": 512999884,
+      "gasUsed": "959578",
+      "effectiveGasPrice": "20000001",
+      "costWei": "19191560959578",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x2848cdc5b992f6ac4d2ea64500a2887be19e7346a76c79c67546b32c44d7e355",
+      "blockNumber": 512999902,
+      "gasUsed": "1005733",
+      "effectiveGasPrice": "20096001",
+      "costWei": "20211211373733",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3e07e69e6da02d4f35adcb163221d4631f8db408ceefaa705945f2073bf4783f",
+      "blockNumber": 512999921,
+      "gasUsed": "1051987",
+      "effectiveGasPrice": "20030001",
+      "costWei": "21071300661987",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xc658fede805e1596a6266100b999de0d6449cfdfd6758888ddcc6d8bce5e6bb5",
+      "blockNumber": 512999927,
+      "gasUsed": "1098243",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21964861098243",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3d591381951c40217e6210c325b0dbf23871cf0af00c478973357bb31c8696b4",
+      "blockNumber": 512999948,
+      "gasUsed": "1144429",
+      "effectiveGasPrice": "20000001",
+      "costWei": "22888581144429",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x993de3c695ca7be58caea1557fad4a64a5ccbdc3574e9112d161d63ec3f8a785",
+      "blockNumber": 512999967,
+      "gasUsed": "1190595",
+      "effectiveGasPrice": "20000001",
+      "costWei": "23811901190595",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xfbbaf21830792cf8e1eb6df74e4697bc64a26ae237fdb0d8b775555308a57ac3",
+      "blockNumber": 512999987,
+      "gasUsed": "1236791",
+      "effectiveGasPrice": "20074001",
+      "costWei": "24827343770791",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xe769163fed65213487d3046f1b8d7529d5ec44eff171adceb81c1a6325947239",
+      "blockNumber": 513000007,
+      "gasUsed": "867218",
+      "effectiveGasPrice": "20006001",
+      "costWei": "17349564175218",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x842ce5ae85f3978968a819dbdf5addd190bd1e6dc3d7da448c08446dd00ae8d6",
+      "blockNumber": 513000028,
+      "gasUsed": "913423",
+      "effectiveGasPrice": "20000001",
+      "costWei": "18268460913423",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x69911c62c60ec5fafe3d0de60daa4946b2016b5f2c496f7bd76d5e4e2b872f50",
+      "blockNumber": 513000049,
+      "gasUsed": "959587",
+      "effectiveGasPrice": "20000001",
+      "costWei": "19191740959587",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x7581b0efba8d76215b25fc6d7ba81dd7fa373c1ad4e9fd97e65be66a3464227a",
+      "blockNumber": 513000069,
+      "gasUsed": "1005701",
+      "effectiveGasPrice": "20000001",
+      "costWei": "20114021005701",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x95b4b16b02246376e8cb3e50726ba7bbb097888e5a99abc2dfa71c9f8358acbb",
+      "blockNumber": 513000090,
+      "gasUsed": "1051965",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21039301051965",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0a2e6ab986d2751943963192f3c9c89e70e43df73e574ead452f04a0b985bd38",
+      "blockNumber": 513000109,
+      "gasUsed": "1098220",
+      "effectiveGasPrice": "20016001",
+      "costWei": "21981972618220",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x9252991c0887c979c17353049f9d0380a9b999685bf70b80a1302f77e98615b9",
+      "blockNumber": 513000130,
+      "gasUsed": "1144421",
+      "effectiveGasPrice": "20024001",
+      "costWei": "22915887248421",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5d2f1ec2dc70ff8e3ea04ce2b2ff10a58fbcb09f9cddf7aba8794609add9b1eb",
+      "blockNumber": 513000151,
+      "gasUsed": "1190673",
+      "effectiveGasPrice": "20006001",
+      "costWei": "23820605228673",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x9e7ce43b9c0ff8941918f21e5f7f12533dc3438114554e32de5fded176f482a4",
+      "blockNumber": 513000168,
+      "gasUsed": "1236800",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24736001236800",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x29ce5cb65661743d58d8777c094bd9049214ec9d2f492d0bb02444ab6f144da4",
+      "blockNumber": 513000184,
+      "gasUsed": "913391",
+      "effectiveGasPrice": "20042001",
+      "costWei": "18306183335391",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x4ab80ee09bfccb3f45ed5dbabdf186e95b746dd08d57f6751016b32f1ede6ba1",
+      "blockNumber": 513000203,
+      "gasUsed": "959593",
+      "effectiveGasPrice": "20014001",
+      "costWei": "19205295261593",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xa025d204cae85503513c98dd50e0b96aedbbd36dd46eaf1bfc0b481562ded8fd",
+      "blockNumber": 513000226,
+      "gasUsed": "1005777",
+      "effectiveGasPrice": "20004001",
+      "costWei": "20119564113777",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x6c4f41386b88d8cfaf50246cc3e1ac481a199134d8679169206ac0ff69cec8d7",
+      "blockNumber": 513000231,
+      "gasUsed": "1051988",
+      "effectiveGasPrice": "20032001",
+      "costWei": "21073424667988",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xb9fac350509c98ab8b814bc3d18ae1100a937fe88f635a0f0f0ceca51b926db2",
+      "blockNumber": 513000246,
+      "gasUsed": "1098223",
+      "effectiveGasPrice": "20006001",
+      "costWei": "21971050436223",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x3924a90cd8ae9cce8c4c2044926adb5ca09bdfa63d9c58811604d7f45943c9c1",
+      "blockNumber": 513000266,
+      "gasUsed": "1144437",
+      "effectiveGasPrice": "20002001",
+      "costWei": "22891030018437",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xf1bb77e60bbe96e06ea5030762b0fa745e5cac533782be3e68800bcbda859f9b",
+      "blockNumber": 513000287,
+      "gasUsed": "1190647",
+      "effectiveGasPrice": "20024001",
+      "costWei": "23841516718647",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xd72d8c43ebb1e4d254376efd139a56bd77e86461b5eb7123828922e7db301614",
+      "blockNumber": 513000308,
+      "gasUsed": "1236770",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24735401236770",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xe6caecd8c5dc35bdaa079f51c34361c33d738d590aef6e8a34e4fe53a12640cd",
+      "blockNumber": 513000328,
+      "gasUsed": "959593",
+      "effectiveGasPrice": "20000001",
+      "costWei": "19191860959593",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xc563cb36913eaacc0a79d6a6026a5da741f93da47a971173cd301b5e3e868657",
+      "blockNumber": 513000346,
+      "gasUsed": "1005835",
+      "effectiveGasPrice": "20016001",
+      "costWei": "20132794365835",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5c57b430d3951b88f902293b8aa392b556d085448597941ee900079713a36bb7",
+      "blockNumber": 513000351,
+      "gasUsed": "1052008",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21040161052008",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x6ccfb5a100c194eaed18e09ec4ff1b581f06e0059dc8308cf4f247aecf747175",
+      "blockNumber": 513000369,
+      "gasUsed": "1098169",
+      "effectiveGasPrice": "20026001",
+      "costWei": "21991933492169",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xc7870e593e13a5f8e114bb6dd2cfaa66727be1dd5435828e80719ce16dd34239",
+      "blockNumber": 513000391,
+      "gasUsed": "1144463",
+      "effectiveGasPrice": "20066001",
+      "costWei": "22964795702463",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xef1a84ad1df700aab5195060e957513ef7e4f52fb6871d21cb5342bdc3f6a103",
+      "blockNumber": 513000410,
+      "gasUsed": "1190651",
+      "effectiveGasPrice": "20048001",
+      "costWei": "23870172438651",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xa7afe8242bb845faa389cd1fc7299d54579428fdc1cc56bae3b7f5b34f0a6542",
+      "blockNumber": 513000432,
+      "gasUsed": "1236724",
+      "effectiveGasPrice": "20186001",
+      "costWei": "24964511900724",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0194a119c4f2f776fedeecf70db595b764b95538816d9421b827da7b025697ee",
+      "blockNumber": 513000452,
+      "gasUsed": "1005775",
+      "effectiveGasPrice": "20040001",
+      "costWei": "20155732005775",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xb9baa4e02ece5102b8ec0b01f780a0dcc7ba3b9d0bfe8c85b63436174c7a3e07",
+      "blockNumber": 513000469,
+      "gasUsed": "1052080",
+      "effectiveGasPrice": "20000001",
+      "costWei": "21041601052080",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x8fa46d1a9694d962661fa4781e0addf9596b15a9c3a655c655df35ac640bf326",
+      "blockNumber": 513000491,
+      "gasUsed": "1098240",
+      "effectiveGasPrice": "20024001",
+      "costWei": "21991158858240",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x4dbe160ac13fe490df4eb42838e77ac456e6356ba842b9ecc8fb55fdc851ca84",
+      "blockNumber": 513000512,
+      "gasUsed": "1144408",
+      "effectiveGasPrice": "20016001",
+      "costWei": "22906471672408",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xdad5bc7c89d26284e70ac13ad9a6b5d06e634d73566e9da64c7ad49eefd4b4c6",
+      "blockNumber": 513000532,
+      "gasUsed": "1190607",
+      "effectiveGasPrice": "20000001",
+      "costWei": "23812141190607",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x86d22835afa26c68de95b2e184f14d712b7ba81a6e32138ba309a6405adbe3fd",
+      "blockNumber": 513000554,
+      "gasUsed": "1236746",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24734921236746",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5b6e78efbbb41948286a62fb34610671a7567159960a2076e54b8fb962a115f2",
+      "blockNumber": 513000574,
+      "gasUsed": "1051870",
+      "effectiveGasPrice": "20256001",
+      "costWei": "21306679771870",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xda7696b6714a7666ce55ae52f25d97102d76db7966c1cc5bce4011e11fbffe7e",
+      "blockNumber": 513000597,
+      "gasUsed": "1098262",
+      "effectiveGasPrice": "20020001",
+      "costWei": "21987206338262",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0a2f9f4cdf20adb1f92792f6fdd8695fabffafea7b493f53401200cb83e54bd6",
+      "blockNumber": 513000614,
+      "gasUsed": "1144426",
+      "effectiveGasPrice": "20000001",
+      "costWei": "22888521144426",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0d28118964d0dd1d6cf29d4bce04d418f6dddfcfd8df9eec31a460327e14f77b",
+      "blockNumber": 513000635,
+      "gasUsed": "1190659",
+      "effectiveGasPrice": "20000001",
+      "costWei": "23813181190659",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xafe0ad47ff1dc189f8c16a019a1e449c0bce394cfeb259ad089ae5fc76483120",
+      "blockNumber": 513000656,
+      "gasUsed": "1236818",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24736361236818",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xbf099d58277bf3481daa5269ce479aa57f3697a26b42bd05092ed9106257aa29",
+      "blockNumber": 513000675,
+      "gasUsed": "1098221",
+      "effectiveGasPrice": "20014001",
+      "costWei": "21979796192221",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xbdfecabb0bdf61cb73263e9d8af5754f3f33d1678bb8916b2c7aa24d34d92ba3",
+      "blockNumber": 513000696,
+      "gasUsed": "1144504",
+      "effectiveGasPrice": "20024001",
+      "costWei": "22917549240504",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xaaa84de02d4baa6234d6e5b96056c4e68716c2ac00ccc1672ac101210f342470",
+      "blockNumber": 513000714,
+      "gasUsed": "1190590",
+      "effectiveGasPrice": "20068001",
+      "costWei": "23892761310590",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x4246ccf6c90bc9d721f7a6291014c781824083c516964a1ff11200ab6bddc227",
+      "blockNumber": 513000733,
+      "gasUsed": "1236779",
+      "effectiveGasPrice": "20012001",
+      "costWei": "24750422584779",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x369a98ef158e7a5a7fabbc6dd1729e607b4bf34f6c73c701a5147545bb631cfd",
+      "blockNumber": 513000753,
+      "gasUsed": "1144446",
+      "effectiveGasPrice": "20006001",
+      "costWei": "22895787820446",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x5b4e53e40595b07a88e875bb21dbd9f502c7d277b2131ba6c19bf2dd8e42df10",
+      "blockNumber": 513000773,
+      "gasUsed": "1190656",
+      "effectiveGasPrice": "20058001",
+      "costWei": "23882179238656",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xc499946f76e2008b4885c145059f991c63e6ba91ac2f3fa0524d8ed149072a27",
+      "blockNumber": 513000792,
+      "gasUsed": "1236775",
+      "effectiveGasPrice": "20228001",
+      "costWei": "25017485936775",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x60634de8da1d95a4b19360fbc4c0881d0571fdd6e4bccbda6983dbcd77e6f3b4",
+      "blockNumber": 513000813,
+      "gasUsed": "1190694",
+      "effectiveGasPrice": "20012001",
+      "costWei": "23828169518694",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xac3e1c124af9b3d74259004434aff7eb57025edbdeebcdb1d999f571b855053f",
+      "blockNumber": 513000833,
+      "gasUsed": "1236877",
+      "effectiveGasPrice": "20000001",
+      "costWei": "24737541236877",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x6f5edc1f1c15a9c046d3976f8957c415cac4bb9218f228360df27644fb7eb529",
+      "blockNumber": 513000848,
+      "gasUsed": "1236810",
+      "effectiveGasPrice": "20010001",
+      "costWei": "24748569336810",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x0cacbfd9778b1776c2e57dbac28d13c9a4ac518bf50a35dc6576b1d0ca451ea8",
+      "blockNumber": 513000870,
+      "gasUsed": "55326",
+      "effectiveGasPrice": "20036001",
+      "costWei": "1108511791326",
+      "contractAddress": null
+    },
+    {
+      "hash": "0xfe8a80e387f0094e4391d7ef9234e929c27ff1e08a0de4d893ca11b9ae5da2cb",
+      "blockNumber": 513000887,
+      "gasUsed": "39038",
+      "effectiveGasPrice": "20012001",
+      "costWei": "781228495038",
+      "contractAddress": null
+    },
+    {
+      "hash": "0x8198d7941864108dfef48584cee2c57d3a4389dd80084106bd7e606f0ed10802",
+      "blockNumber": 513000904,
+      "gasUsed": "29175",
+      "effectiveGasPrice": "20000001",
+      "costWei": "583500029175",
+      "contractAddress": null
+    }
+  ]
+}

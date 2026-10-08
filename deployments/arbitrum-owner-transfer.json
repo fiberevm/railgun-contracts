@@ -1,0 +1,36 @@
+{
+  "status": "confirmed",
+  "network": "arbitrum",
+  "chainId": 42161,
+  "delegator": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+  "previousOwner": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
+  "newOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+  "baseReference": {
+    "chainId": 8453,
+    "proxy": "0x22F45899EE13042ae046f7Aa7C2292Ea74C7F1c6",
+    "delegator": "0xB6e3da436219aee42935bEE21980f39BaFD873E9",
+    "delegatorOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc"
+  },
+  "estimatedGas": "29727",
+  "estimatedCostETH": "0.00000059572908",
+  "startingBalanceETH": "0.002789593594608453",
+  "transaction": {
+    "to": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "data": "0xf2fde38b000000000000000000000000f57710ec707cce333df85d2c12b42e17b6f8d8fc",
+    "value": "0",
+    "chainId": 42161
+  },
+  "transactionHash": "0x4d42698c036773b872fc1e0781011dc81d7bd376c555949190755d351abcb40c",
+  "blockNumber": 513001670,
+  "gasUsed": "29172",
+  "effectiveGasPrice": "20040000",
+  "costETH": "0.00000058460688",
+  "remainingBalanceETH": "0.002789008987728453",
+  "verified": {
+    "delegatorOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+    "railgunOwner": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "proxyAdminOwner": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "newOwnerCanUpgrade": true,
+    "previousOwnerCanUpgrade": false
+  }
+}

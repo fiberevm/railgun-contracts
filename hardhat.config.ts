@@ -50,6 +50,16 @@ const config: HardhatUserConfig = {
       accounts,
       chainId: 84532,
     },
+    arbitrum: {
+      url: process.env.ARBITRUM_RPC_URL ?? process.env.RPC_URL ?? 'https://arb1.arbitrum.io/rpc',
+      accounts,
+      chainId: 42161,
+    },
+    polygon: {
+      url: process.env.POLYGON_RPC_URL ?? process.env.RPC_URL ?? 'https://polygon.drpc.org',
+      accounts,
+      chainId: 137,
+    },
     bnb: {
       url: process.env.BNB_RPC_URL ?? process.env.RPC_URL ?? 'https://bsc-dataseed.binance.org/',
       accounts,
@@ -93,13 +103,8 @@ const config: HardhatUserConfig = {
     currency: 'USD',
   },
   etherscan: {
-    apiKey: {
-      mainnet: process.env.ETHERSCAN_API_KEY ?? '',
-      sepolia: process.env.ETHERSCAN_API_KEY ?? '',
-      base: process.env.BASESCAN_API_KEY ?? '',
-      baseSepolia: process.env.BASESCAN_API_KEY ?? '',
-      bnb: process.env.BSCSCAN_API_KEY ?? '',
-    },
+    // hardhat-verify 2.1+ uses a single Etherscan API V2 key across supported chains.
+    apiKey: process.env.ETHERSCAN_API_KEY ?? '',
     customChains: [
       {
         network: 'base',

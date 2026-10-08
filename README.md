@@ -8,6 +8,55 @@
 - (Optional) Install `hardhat-shorthand` to use `hh` commands.
 - Run `hh help` or `npx hardhat help` for list of commands
 
+## Arbitrum One deployment
+
+Arbitrum One mainnet is configured as the `arbitrum` Hardhat network (chain ID `42161`).
+Deploy the zero-fee, no-governance setup with the same bundler used by the Ethereum and
+Base deployments:
+
+```bash
+ARBITRUM_RPC_URL=<RPC_URL> PRIVATE_KEY=<DEPLOYER_PRIVATE_KEY> \
+  yarn hardhat deploy:no_governance --network arbitrum \
+  --bundler 0x3674DCF19Df34505E091Df4882318A1e99eD3e29
+```
+
+The deployer must hold enough ETH on Arbitrum One for gas. A successful deployment writes
+`deployments/arbitrum.json`. Run `yarn hardhat verify:runtime --network arbitrum` afterward.
+Set `ETHERSCAN_API_KEY` before running `yarn hardhat verify:source --network arbitrum`.
+The default public RPC is `https://arb1.arbitrum.io/rpc`, as listed in the
+[Arbitrum chain information](https://docs.arbitrum.io/chain-info).
+
+The deployed Railgun proxy is
+[0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092](https://arbiscan.io/address/0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092).
+Contract addresses are recorded in [`deployments/arbitrum.json`](deployments/arbitrum.json),
+with transaction receipts and runtime verification results in
+[`deployments/arbitrum-transactions.json`](deployments/arbitrum-transactions.json).
+
+The Arbitrum Delegator is owned by
+[0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc](https://arbiscan.io/address/0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc),
+matching the controlling owner of the Base deployment. Use this owner's signing key for
+future administration. The ownership transfer is recorded in
+[`deployments/arbitrum-owner-transfer.json`](deployments/arbitrum-owner-transfer.json).
+
+The deployment and ownership transfer confirmed 109 transactions, costing
+`0.002210991012271547 ETH` in total. Runtime verification matched all eight deployed
+contracts against the simulation and checked all 91 circuit keys. Shield, unshield, and
+NFT fees are zero. Explorer source verification was not performed during deployment.
+
+## Polygon PoS deployment
+
+Polygon PoS mainnet is configured as the `polygon` Hardhat network (chain ID `137`). Deploy
+the no-governance setup with the same bundler used by the Ethereum and Base deployments:
+
+```bash
+POLYGON_RPC_URL=<RPC_URL> PRIVATE_KEY=<DEPLOYER_PRIVATE_KEY> \
+  yarn hardhat deploy:no_governance --network polygon \
+  --bundler 0x3674DCF19Df34505E091Df4882318A1e99eD3e29
+```
+
+The deployer must hold enough native POL for gas. A successful deployment writes
+`deployments/polygon.json`. Set `ETHERSCAN_API_KEY` before running `verify:source`.
+
 ## Railgun upgrade runbook
 
 `upgrade:railgun` upgrades the Railgun proxy in `deployments/<network>.json`.
@@ -17,7 +66,8 @@
 - `PRIVATE_KEY`, `OWNER_PRIVATE_KEY`, or `owner_private_key`: upgrade signer.
 - `ETH_RPC_URL`: Ethereum mainnet RPC URL.
 - `BASE_RPC_URL`: Base mainnet RPC URL.
-- `ETHERSCAN_API_KEY` or `BASESCAN_API_KEY`: source verification only.
+- `ARBITRUM_RPC_URL`: Arbitrum One mainnet RPC URL.
+- `ETHERSCAN_API_KEY`: multichain source verification only.
 
 ### Preflight
 

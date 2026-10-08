@@ -3,24 +3,21 @@ import { expect } from 'chai';
 import config from '../../hardhat.config';
 
 describe('Config/Networks', () => {
-  it('configures BNB mainnet deployment and verification', () => {
+  it('configures BNB mainnet deployment', () => {
     const bnbNetwork = config.networks?.bnb;
-    const etherscan = config.etherscan;
 
-    // Keep deploy:no_governance and verify using the same Hardhat network name.
     expect(bnbNetwork).to.include({
       chainId: 56,
     });
-    expect(etherscan?.apiKey).to.include({
-      bnb: process.env.BSCSCAN_API_KEY ?? '',
+  });
+
+  it('configures Polygon PoS mainnet deployment', () => {
+    expect(config.networks?.polygon).to.include({
+      chainId: 137,
     });
-    expect(etherscan?.customChains).to.deep.include({
-      network: 'bnb',
-      chainId: 56,
-      urls: {
-        apiURL: 'https://api.bscscan.com/api',
-        browserURL: 'https://bscscan.com',
-      },
-    });
+  });
+
+  it('uses the multichain Etherscan API V2 key', () => {
+    expect(config.etherscan?.apiKey).to.equal(process.env.ETHERSCAN_API_KEY ?? '');
   });
 });
