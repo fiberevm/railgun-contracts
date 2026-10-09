@@ -43,6 +43,19 @@ The deployment and ownership transfer confirmed 109 transactions, costing
 contracts against the simulation and checked all 91 circuit keys. Shield, unshield, and
 NFT fees are zero. Explorer source verification was not performed during deployment.
 
+## FUSDT0 Aave V3 vault
+
+The Arbitrum USDT0 earn vault is
+[FUSDT0 (`0x5a847BE0F397a57C8f7E4193AF093F4f0A422571`)](https://arbiscan.io/address/0x5a847BE0F397a57C8f7E4193AF093F4f0A422571),
+using Aave's unmodified immutable ERC-4626 vault. It has a 25% performance fee,
+with all fee withdrawals controlled by the same owner as Railgun and no Aave Labs
+fee split. Its initial seed is 1 USDT0.
+
+See [`deployments/fusdt0/README.md`](deployments/fusdt0/README.md) for the ABI,
+pinned source, fork tests, and operating details, and
+[`deployments/fusdt0-arbitrum.json`](deployments/fusdt0-arbitrum.json) for configuration
+and transaction receipts.
+
 ## Polygon PoS deployment
 
 Polygon PoS mainnet is configured as the `polygon` Hardhat network (chain ID `137`). Deploy

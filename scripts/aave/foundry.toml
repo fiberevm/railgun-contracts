@@ -1,0 +1,21 @@
+[profile.default]
+src = "src"
+test = "test"
+out = "../ephemeral/fusdt0-build"
+cache_path = "../ephemeral/fusdt0-cache"
+solc = "0.8.22"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 30000
+bytecode_hash = "none"
+build_info = true
+libs = ["../ephemeral/aave-vault/lib"]
+allow_paths = ["../ephemeral/aave-vault"]
+remappings = [
+  "AaveVault/=../ephemeral/aave-vault/src/",
+  "forge-std/=../ephemeral/aave-vault/lib/forge-std/src/",
+  "@openzeppelin-upgradeable/=../ephemeral/aave-vault/lib/openzeppelin-contracts-upgradeable/contracts/",
+  "@openzeppelin/=../ephemeral/aave-vault/lib/openzeppelin-contracts/contracts/",
+  "@aave-v3-core/=../ephemeral/aave-vault/lib/aave-v3-core/contracts/",
+  "@aave-v3-periphery/=../ephemeral/aave-vault/lib/aave-v3-periphery/contracts/"
+]
