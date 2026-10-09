@@ -343,7 +343,24 @@
     "sourceVerificationStatus": "match",
     "sourceVerificationJobId": "44b621e6-203b-43ae-8317-8a9308a55871",
     "sourceVerificationUrl": "https://sourcify.dev/server/v2/verify/44b621e6-203b-43ae-8317-8a9308a55871",
-    "arbiscanSourceVerificationPerformed": false
+    "arbiscanSourceVerificationPerformed": true,
+    "arbiscanVerificationSubmitted": true,
+    "arbiscanVerificationSubmissionId": "9d1c3tzytlehsqqwkcmhb1gymdnyereixcgk4nd3ltkaqeyjad",
+    "arbiscanVerificationSubmissionResult": "Already Verified",
+    "arbiscanVerificationSubmissionResponse": {
+      "status": "0",
+      "message": "NOTOK",
+      "result": "Already Verified"
+    },
+    "arbiscanSourceVerificationStatus": "similar-match",
+    "arbiscanExactMatchVerified": false,
+    "arbiscanReportedContractName": "ATokenVault",
+    "arbiscanSimilarMatch": "M_f9c63fe4225e26a6df944d2b85e461738611ef6f",
+    "arbiscanConstructorArgumentsMatch": false,
+    "arbiscanCheckedAt": "2026-10-09T21:06:39.749Z",
+    "arbiscanVerificationUrl": "https://arbiscan.io/address/0x5a847BE0F397a57C8f7E4193AF093F4f0A422571#code",
+    "arbiscanExactMatchRequirement": "Verify address ownership with an explorer account, then obtain Similar Match re-verification whitelisting from explorer support.",
+    "arbiscanExactMatchRequirementUrl": "https://info.etherscan.com/update-on-similar-match-contract-verification/"
   },
   "gasCostEth": "0.000217379782368",
   "remainingDeployerEth": "0.002571629205360453",

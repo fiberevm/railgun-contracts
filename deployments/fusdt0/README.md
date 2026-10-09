@@ -37,11 +37,52 @@ vault itself. No user deposit beyond this deployment seed was made.
 Source: [aave/aave-vault at `5ab52d20b07f35a8f34e6702f2fea6797a5787eb`](https://github.com/aave/aave-vault/tree/5ab52d20b07f35a8f34e6702f2fea6797a5787eb).
 Sourcify verified the deployed source with status `match`:
 [verification result](https://sourcify.dev/server/v2/verify/44b621e6-203b-43ae-8317-8a9308a55871).
-Arbiscan source verification was not submitted because no Etherscan API key was configured.
+Arbiscan verification was submitted through Etherscan's V2 API. Submission
+`9d1c3tzytlehsqqwkcmhb1gymdnyereixcgk4nd3ltkaqeyjad` returned `Already Verified`.
+As of `2026-10-09T21:06:39.749Z`, Arbiscan retains an automatic cross-chain
+**Similar Match** to Base's
+[`0xf9c63fe4225e26a6df944d2b85e461738611ef6f`](https://basescan.org/address/0xf9c63fe4225e26a6df944d2b85e461738611ef6f#code)
+and reports the matched source name as `ATokenVault`. It has not recorded an
+Exact Match for this deployment's `ImmutableATokenVault` constructor arguments.
+The saved artifact and deployment record describe the contract actually deployed.
+
+The explorer's [Similar Match re-verification process](https://info.etherscan.com/update-on-similar-match-contract-verification/)
+requires [verifying address ownership](https://info.etherscan.com/how-to-verify-address-ownership/)
+with an explorer account, then requesting account whitelisting through
+[Arbiscan support](https://arbiscan.io/contactus). The deployment signer is
+available locally for the account-specific ownership message. Once whitelisted,
+resubmit `compiler-input.json` for `src/ImmutableATokenVault.sol:ImmutableATokenVault`
+with the compiler settings below and `constructorArguments` from the deployment
+record. No support request has been sent.
+
 Compilation used Solidity `0.8.22+commit.4fc1097e`, 30,000 optimizer runs, no IR,
 Shanghai bytecode, and metadata bytecode hash `none`. Tests execute using Cancun,
 which is required by the current Aave pool implementation. Foundry 1.7.1 targets
 Shanghai during Solidity 0.8.22 compilation when configured to execute Cancun.
+
+### Prepared support request
+
+Subject: Enable Similar Match re-verification for FUSDT0 on Arbitrum One
+
+Please whitelist my account for Similar Match re-verification of contract
+`0x5a847BE0F397a57C8f7E4193AF093F4f0A422571` on Arbitrum One (chain ID 42161).
+I want to submit an Exact Match for Aave's unmodified `ImmutableATokenVault`,
+deployed in transaction
+`0xa33a215a8388098754a15cdb9890459e68b03433724658bdefb6c8c345b50be3`
+by `0x119aa0EA38abD1D6299e08c73A08d693395AC0f6`.
+
+Arbiscan currently displays a cross-chain Similar Match to Base contract
+`0xf9c63fe4225e26a6df944d2b85e461738611ef6f`, identified as `ATokenVault`.
+My exact-source API submission
+`9d1c3tzytlehsqqwkcmhb1gymdnyereixcgk4nd3ltkaqeyjad` returned `Already Verified`,
+and the browser verification form is disabled. Please enable re-verification
+so the deployed constructor and contract name can be matched.
+
+The full source, compiler input, artifact and constructor arguments are published
+at [fiberevm/railgun-contracts, deployment commit `f0932cc0e9c0adc4ba700d9f86675f2e4b38becc`](https://github.com/fiberevm/railgun-contracts/tree/f0932cc0e9c0adc4ba700d9f86675f2e4b38becc/deployments/fusdt0).
+The source is pinned to Aave commit `5ab52d20b07f35a8f34e6702f2fea6797a5787eb`,
+and Sourcify reports a source match. I can provide an account-specific ownership
+signature from the deployment address.
 
 ## Reproduce the fork checks
 
