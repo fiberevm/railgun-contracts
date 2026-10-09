@@ -353,6 +353,11 @@
       "result": "Already Verified"
     },
     "arbiscanSourceVerificationStatus": "similar-match",
+    "arbiscanVerificationAcceptance": {
+      "status": "similar-match",
+      "acceptedBy": "deployment-requester",
+      "acceptedOn": "2026-10-09"
+    },
     "arbiscanExactMatchVerified": false,
     "arbiscanReportedContractName": "ATokenVault",
     "arbiscanSimilarMatch": "M_f9c63fe4225e26a6df944d2b85e461738611ef6f",
