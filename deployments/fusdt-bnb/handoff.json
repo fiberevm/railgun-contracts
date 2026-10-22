@@ -1,0 +1,68 @@
+{
+  "project": "FUSDT Aave V3 USDT wrapper",
+  "status": "deployed",
+  "network": "BNB Smart Chain mainnet",
+  "chainId": 56,
+  "rpcUrl": "https://bsc-dataseed.bnbchain.org",
+  "explorerUrl": "https://bscscan.com",
+  "vault": "0x5a847BE0F397a57C8f7E4193AF093F4f0A422571",
+  "shareToken": "0x5a847BE0F397a57C8f7E4193AF093F4f0A422571",
+  "name": "FUSDT",
+  "symbol": "FUSDT",
+  "decimals": 18,
+  "asset": "0x55d398326f99059fF775485246999027B3197955",
+  "assetSymbol": "USDT",
+  "assetDecimals": 18,
+  "aToken": "0xa9251ca9DE909CB71783723713B21E4233fbf1B1",
+  "pool": "0x6807dc923806fE8Fd134338EABCA509979a7e0cB",
+  "poolAddressesProvider": "0xff75B6da14FfbbfD355Daf7a2731456b3562Ba6D",
+  "owner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+  "performanceFeePercent": 25,
+  "performanceFeeWad": "250000000000000000",
+  "aaveLabsFeeSplitPercent": 0,
+  "referralCode": 0,
+  "feeWithdrawal": {
+    "controller": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+    "asset": "0xa9251ca9DE909CB71783723713B21E4233fbf1B1",
+    "recipient": "Chosen by the owner in withdrawFees(to, amount)"
+  },
+  "upgradeable": false,
+  "initialLockedSeed": "1 USDT",
+  "initialLockedSeedRaw": "1000000000000000000",
+  "initialLockedSharesRaw": "1000000000000000000",
+  "railgunProxy": "0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092",
+  "deployment": {
+    "deployer": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
+    "approvalTransaction": "0x922b5be22e72356ceb6c45df135bba8856a98cfff24cd0aad7ff91df70c75562",
+    "deploymentTransaction": "0x56a000582b78e7995d08a196cb816135285f044b1e9c0ad38072f0b627d7a590",
+    "approvalBlock": 129142209,
+    "deploymentBlock": 129142215,
+    "gasCostBNB": "0.00026918075",
+    "remainingDeployerBNB": "0.0052475891"
+  },
+  "verification": {
+    "runtimeBytecodeMatched": true,
+    "runtimeCodeHash": "0x165c09e4f45fb7478087ce8daa055946cacb20565c08c706d82855ed1c4d58ac",
+    "ownerAndReserveVerified": true,
+    "forkTestsPassed": 3,
+    "forkBlock": 129142000,
+    "sourceVerificationProvider": "sourcify",
+    "sourceVerificationStatus": "match",
+    "sourceVerificationUrl": "https://sourcify.dev/server/v2/verify/7828df5c-ab55-4ebd-984d-5b2a569622c1",
+    "bscscanSourceVerificationSubmitted": false
+  },
+  "source": {
+    "repository": "https://github.com/aave/aave-vault",
+    "commit": "5ab52d20b07f35a8f34e6702f2fea6797a5787eb",
+    "contract": "ImmutableATokenVault",
+    "compiler": "0.8.22+commit.4fc1097e"
+  },
+  "repository": {
+    "url": "https://github.com/fiberevm/railgun-contracts",
+    "branch": "main",
+    "configuration": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/fusdt-bnb.json",
+    "handoff": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/fusdt-bnb/handoff.json",
+    "abi": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/fusdt-bnb/abi.json",
+    "integrationNotes": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/fusdt-bnb/README.md"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "chainId": 56,
+  "status": "passed",
+  "testsPassed": 3,
+  "testNames": [
+    "testConfigurationAndOwnerPermissions",
+    "testDepositRedeemRoundTrip",
+    "testQuarterOfYieldWithdrawnEntirelyToOwner"
+  ],
+  "forkBlock": 129142000,
+  "rpcUrl": "https://bsc-dataseed.bnbchain.org",
+  "compiler": "0.8.22+commit.4fc1097e",
+  "sourceCommit": "5ab52d20b07f35a8f34e6702f2fea6797a5787eb",
+  "creationBytecodeHash": "0xe3be56dab30c0d76c58602bb3503cda86f0861c25deef46e88ecd6239e968368",
+  "checkedAt": "2026-10-22T13:58:47.928Z"
+}

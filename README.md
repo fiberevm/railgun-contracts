@@ -114,6 +114,22 @@ pinned source, fork tests, and operating details, and
 [`deployments/fusdt0-arbitrum.json`](deployments/fusdt0-arbitrum.json) for configuration
 and transaction receipts.
 
+## FUSDT Aave V3 vault on BNB
+
+The BNB USDT earn wrapper is
+[FUSDT (`0x5a847BE0F397a57C8f7E4193AF093F4f0A422571`)](https://bscscan.com/address/0x5a847BE0F397a57C8f7E4193AF093F4f0A422571).
+It uses Aave V3, with 18-decimal USDT and 18-decimal shares. The owner is
+`0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc`; its performance fee is 25%,
+with no Aave Labs fee split. Its permanently locked seed is 1 USDT.
+
+Approval and deployment cost `0.00026918075 BNB`. Three BNB mainnet-fork tests
+passed, live runtime/owner/reserve checks passed, and Sourcify verified the source
+with status `match`.
+
+See the [copyable handoff](deployments/fusdt-bnb/handoff.json),
+[ABI and integration notes](deployments/fusdt-bnb/README.md), and
+[configuration and transaction receipts](deployments/fusdt-bnb.json).
+
 ## Polygon PoS deployment
 
 Polygon PoS mainnet is configured as the `polygon` Hardhat network (chain ID `137`). Deploy
