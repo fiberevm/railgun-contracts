@@ -61,7 +61,7 @@ const config: HardhatUserConfig = {
       chainId: 137,
     },
     bnb: {
-      url: process.env.BNB_RPC_URL ?? process.env.RPC_URL ?? 'https://bsc-dataseed.binance.org/',
+      url: process.env.BNB_RPC_URL ?? process.env.RPC_URL ?? 'https://bsc-dataseed.bnbchain.org',
       accounts,
       chainId: 56,
     },

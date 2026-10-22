@@ -43,6 +43,49 @@ The deployment and ownership transfer confirmed 109 transactions, costing
 contracts against the simulation and checked all 91 circuit keys. Shield, unshield, and
 NFT fees are zero. Explorer source verification was not performed during deployment.
 
+## BNB Smart Chain deployment
+
+BNB Smart Chain mainnet is configured as `bnb` (chain ID `56`). The guarded
+deployment runner uses the same bundler and controlling owner as Base and
+Arbitrum, with zero shield, unshield, and NFT fees. Its total gas budget is
+`0.011 BNB`, and it stops if the gas price exceeds `0.1 gwei`.
+
+The latest live funding check is saved in
+[`deployments/bnb-preflight.json`](deployments/bnb-preflight.json). Its expected
+addresses describe the plan; a completed deployment is recorded separately in
+`deployments/bnb.json`.
+
+With the existing deployment signer in the ignored `.env`, first simulate the
+complete deployment locally with chain ID 56:
+
+```bash
+rtk node node_modules/hardhat/internal/cli/cli.js run scripts/bnb/deploy.ts \
+  --config scripts/bnb/hardhat.config.ts --network hardhat
+```
+
+For an optional mainnet fork, set `BNB_FORK_RPC_URL` to an RPC that serves
+historical state; `BNB_FORK_BLOCK` pins its block. Public endpoints may prune
+state before the simulation finishes. The runner records whether the simulation
+used a local chain or fork and checks all eight contract runtimes, all 91 circuit
+keys, the zero fees, bundler, both proxies, and final owner permissions. Its
+transaction plan is saved in the ignored `scripts/ephemeral/bnb-plan.json`.
+
+Run a read-only live preflight, then explicitly enable broadcasting:
+
+```bash
+rtk node node_modules/hardhat/internal/cli/cli.js run scripts/bnb/deploy.ts --network bnb
+rtk env BNB_DEPLOY_BROADCAST=1 node node_modules/hardhat/internal/cli/cli.js \
+  run scripts/bnb/deploy.ts --network bnb
+```
+
+The runner writes each signed transaction hash and request to
+`deployments/bnb-transactions.json` before submitting it. Rerunning with the same
+plan resumes the journal and confirms existing receipts. It rejects an unrelated
+signer nonce or an inconsistent saved plan. After all 109 transactions confirm,
+it compares live runtime hashes with the simulation and saves the final addresses
+in `deployments/bnb.json`, including the ownership transfer to
+`0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc`.
+
 ## FUSDT0 Aave V3 vault
 
 The Arbitrum USDT0 earn vault is
