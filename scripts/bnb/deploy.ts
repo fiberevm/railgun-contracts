@@ -370,18 +370,18 @@ async function deploy() {
         nonce: transaction.nonce,
         ...(transaction.to ? { to: transaction.to } : {}),
         data: transaction.data,
-        value: '0',
+        value: '0x00',
         chainId: 56,
         type: 0,
-        gasLimit: '0',
-        gasPrice: price.toString(),
+        gasLimit: '0x00',
+        gasPrice: price.toHexString(),
       };
       const estimate = await signer.estimateGas({ ...request, gasLimit: undefined });
       assert(
         estimate.lte(BigNumber.from(transaction.gasUsed).mul(2)),
         'Gas estimate differs significantly from simulation',
       );
-      request.gasLimit = estimate.mul(12).div(10).toString();
+      request.gasLimit = estimate.mul(12).div(10).toHexString();
       const spent = journal.transactions.reduce(
         (sum, tx) => sum.add(tx.costWei ?? 0),
         BigNumber.from(0),

@@ -50,6 +50,21 @@ deployment runner uses the same bundler and controlling owner as Base and
 Arbitrum, with zero shield, unshield, and NFT fees. Its total gas budget is
 `0.011 BNB`, and it stops if the gas price exceeds `0.1 gwei`.
 
+The deployed proxy is
+[`0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092`](https://bscscan.com/address/0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092).
+All 109 transactions confirmed between blocks `129064177` and `129064904`,
+including the final ownership transfer to
+`0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc`. Total gas cost was
+`0.00548323015 BNB`; `0.00551676985 BNB` remains in the deployment wallet.
+Live verification matched all eight runtime bytecodes and all 91 circuit keys,
+and checked proxy settings, fees, bundler and upgrade permissions. Explorer
+source verification was not submitted.
+
+See the [copyable handoff](deployments/bnb/handoff.json),
+[integration notes and ABIs](deployments/bnb/README.md),
+[deployment configuration](deployments/bnb.json), and
+[all transaction requests and receipts](deployments/bnb-transactions.json).
+
 The latest live funding check is saved in
 [`deployments/bnb-preflight.json`](deployments/bnb-preflight.json). Its expected
 addresses describe the plan; a completed deployment is recorded separately in

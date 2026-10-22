@@ -1,13 +1,13 @@
 {
-  "status": "awaiting-funding",
+  "status": "deployed",
   "network": "bnb",
   "chainId": 56,
-  "checkedAt": "2026-10-22T04:10:20.451Z",
-  "checkedAtBlock": 129063593,
+  "checkedAt": "2026-10-22T04:14:40.835Z",
+  "checkedAtBlock": 129064172,
   "deployer": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
   "owner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
   "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29",
-  "balanceBNB": "0.0",
+  "balanceBNB": "0.011",
   "estimatedRemainingCostBNB": "0.00548323015",
   "gasPriceGwei": "0.05",
   "budgetBNB": "0.011",
@@ -26,5 +26,7 @@
     "implementation": "0xf1239bE1C543975c30509E667dB21527A2A0053E",
     "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
   },
-  "deploymentPlanHash": "0xe3ee044b25cecd568858fbed609ebcf5877d1955eaf48e964a3d3695334af29a"
+  "deploymentPlanHash": "0xe3ee044b25cecd568858fbed609ebcf5877d1955eaf48e964a3d3695334af29a",
+  "completedAt": "2026-10-22T04:20:26.193Z",
+  "remainingBalanceBNB": "0.00551676985"
 }

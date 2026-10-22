@@ -1,0 +1,48 @@
+{
+  "network": "bnb",
+  "chainId": 56,
+  "status": "deployed",
+  "deployer": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
+  "contracts": {
+    "poseidonT3": "0x956b2e366b9d0f265DA27eEfBc87572Eec71d6DE",
+    "poseidonT4": "0xED978DA53695CEd117B91598fdc613607Ea6bFfE",
+    "delegator": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "treasuryImplementation": "0x58b4a4604e8c142D47c2696a6ad75692C71d8F99",
+    "proxyAdmin": "0xDAA9EA0D72d03E7F0457945e0D1b6bb2541CeF42",
+    "treasuryProxy": "0x2CD346d310d33074f946B82b9C216c4D79053C9a",
+    "proxy": "0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092",
+    "implementation": "0xf1239bE1C543975c30509E667dB21527A2A0053E",
+    "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
+  },
+  "ownership": {
+    "delegatorOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+    "transactionHash": "0xc22c57bbc7b654790d46bb91f2e2a7d9bfc43eb0f8116d239541bd781333ceb8",
+    "baseReference": {
+      "chainId": 8453,
+      "proxy": "0x22F45899EE13042ae046f7Aa7C2292Ea74C7F1c6",
+      "delegator": "0xB6e3da436219aee42935bEE21980f39BaFD873E9",
+      "delegatorOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc"
+    }
+  },
+  "rpcUrl": "https://bsc-dataseed.bnbchain.org",
+  "blockExplorerUrl": "https://bscscan.com",
+  "fees": {
+    "shield": "0",
+    "unshield": "0",
+    "nft": "0"
+  },
+  "verification": {
+    "runtimeBytecodeContracts": 8,
+    "circuitKeys": 91,
+    "sourceVerificationPerformed": false,
+    "verifiedAtBlock": 129064937
+  },
+  "deploymentPlanHash": "0xe3ee044b25cecd568858fbed609ebcf5877d1955eaf48e964a3d3695334af29a",
+  "simulation": {
+    "mode": "local",
+    "gasUsed": "109664603",
+    "transactions": 109
+  },
+  "gasCostBNB": "0.00548323015",
+  "remainingDeployerBNB": "0.00551676985"
+}

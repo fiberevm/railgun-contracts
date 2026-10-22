@@ -1,0 +1,97 @@
+{
+  "project": "Railgun",
+  "status": "deployed",
+  "network": {
+    "name": "BNB Smart Chain mainnet",
+    "chainId": 56,
+    "caip2": "eip155:56",
+    "nativeCurrency": {
+      "symbol": "BNB",
+      "decimals": 18
+    },
+    "rpcUrl": "https://bsc-dataseed.bnbchain.org",
+    "blockExplorerUrl": "https://bscscan.com",
+    "eventSyncRpcRequirement": "Use an RPC supporting eth_getLogs; the default official public endpoint disables log queries."
+  },
+  "contracts": {
+    "poseidonT3": "0x956b2e366b9d0f265DA27eEfBc87572Eec71d6DE",
+    "poseidonT4": "0xED978DA53695CEd117B91598fdc613607Ea6bFfE",
+    "delegator": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "treasuryImplementation": "0x58b4a4604e8c142D47c2696a6ad75692C71d8F99",
+    "proxyAdmin": "0xDAA9EA0D72d03E7F0457945e0D1b6bb2541CeF42",
+    "treasuryProxy": "0x2CD346d310d33074f946B82b9C216c4D79053C9a",
+    "proxy": "0x7233d17ec3Ce855Acb8F7A9412Bf90757117A092",
+    "implementation": "0xf1239bE1C543975c30509E667dB21527A2A0053E",
+    "bundler": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29"
+  },
+  "ownership": {
+    "controllingOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+    "delegatorOwner": "0xf57710Ec707CcE333DF85d2C12b42e17B6f8d8Fc",
+    "railgunOwner": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "proxyAdminOwner": "0x51145142FDCf5d52C562F0EcE21521099267A15D",
+    "deployerRetainsUpgradePermission": false
+  },
+  "fees": {
+    "shieldRaw": "0",
+    "unshieldRaw": "0",
+    "nftRaw": "0"
+  },
+  "access": {
+    "shieldCaller": "0x3674DCF19Df34505E091Df4882318A1e99eD3e29",
+    "transact": "Public entry point; transaction proofs are validated"
+  },
+  "deployment": {
+    "deployer": "0x119aa0EA38abD1D6299e08c73A08d693395AC0f6",
+    "transactionCount": 109,
+    "startBlock": 129064177,
+    "railgunProxyCreationBlock": 129064218,
+    "railgunInitializationBlock": 129064265,
+    "completionBlock": 129064904,
+    "contractCreationTransactions": {
+      "poseidonT3": "0x2b937c70217694f3d0913cdee292f621099d05370713c11c9148f8edcf78b7fe",
+      "poseidonT4": "0x235bdfc2cd33f683ad8dbb055ebfab73e0b6f0f57111e0f91a4bf8b2a7aac5b7",
+      "delegator": "0x44e90f9ba1fc8f887d481d29f98da5921bd9f65c1036dfb5ffce547884a987a9",
+      "treasuryImplementation": "0xe79f2c4fcf8c19d4f58e68cac425b28e13ae847a662c109f1ff103953faab8d7",
+      "proxyAdmin": "0xd464fb856bf7c38796743e6a9f79b2518c8ee8502ba3d2d0409e14493cad3b33",
+      "treasuryProxy": "0xd2e55836298c8a4389c250fbb40750b7b1d948194ae246446635cf8afdfce8eb",
+      "proxy": "0xf529c2b48b009928ca672e26a754cbecce9eecb63256458e99c131e224c7b079",
+      "implementation": "0x8056de443bcb55b553487a9d47fb1f4b2323fe9ce1ddb924c702e82eb74ec59d"
+    },
+    "ownerTransferTransaction": "0xc22c57bbc7b654790d46bb91f2e2a7d9bfc43eb0f8116d239541bd781333ceb8",
+    "gasUsed": "109664603",
+    "gasCostBNB": "0.00548323015",
+    "remainingDeployerBNB": "0.00551676985",
+    "deploymentPlanHash": "0xe3ee044b25cecd568858fbed609ebcf5877d1955eaf48e964a3d3695334af29a"
+  },
+  "verification": {
+    "runtimeBytecodesMatched": 8,
+    "circuitKeysVerified": 91,
+    "proxyConfigurationVerified": true,
+    "ownerAndUpgradePermissionsVerified": true,
+    "zeroFeesAndBundlerVerified": true,
+    "sourceVerificationSubmitted": false,
+    "simulationMode": "local",
+    "verifiedAtBlock": 129064937,
+    "runtimeHashes": {
+      "poseidonT3": "0x354b26999e434f8256d168395315e1f51fc15bf49bf2e6bb58fc549bd597e7da",
+      "poseidonT4": "0xe247ac4f3d40602f0ac0604b0f1fe631237cbc64d3e29a5d5e45721f2d94fa81",
+      "delegator": "0x35c5c85afef74bf24e12f6f7180bb40e9598be50144f0a488278e181bb16a30e",
+      "treasuryImplementation": "0xa702b6789e395e7fbd6cd1c975411b2a0a910e111a9e1892b271b345fc062844",
+      "proxyAdmin": "0x0bc9abe32fd0d78623958ff7b21525fba9f1baae95c48bade648976070573b98",
+      "treasuryProxy": "0xe9bcdc3bea3cda0b9e8e9337899c43175a19aac915d12bde6fa519df72cb95a9",
+      "proxy": "0xe9bcdc3bea3cda0b9e8e9337899c43175a19aac915d12bde6fa519df72cb95a9",
+      "implementation": "0x8dc7e290b42d75408302cc882a14ee55416e2fe0731b92c480f6120b9946a2d5"
+    }
+  },
+  "repository": {
+    "url": "https://github.com/fiberevm/railgun-contracts",
+    "branch": "main",
+    "contractSourceCommit": "b528351616d7ff67c384f10b75a8d46cb7f8a8c2",
+    "configuration": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/bnb.json",
+    "allTransactionRequestsAndReceipts": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/bnb-transactions.json",
+    "handoff": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/bnb/handoff.json",
+    "integrationNotes": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/bnb/README.md",
+    "railgunAbi": "https://github.com/fiberevm/railgun-contracts/blob/main/deployments/bnb/RailgunSmartWallet.abi.json",
+    "administrationAbis": "https://github.com/fiberevm/railgun-contracts/tree/main/deployments/bnb"
+  }
+}
